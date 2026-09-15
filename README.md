@@ -2,24 +2,29 @@
 
 Landing page premium en una sola página (scrollytelling) para Diamante Selected Meats.
 
-## Cómo ejecutarlo (Windows / VS Code)
+## Clonar y ejecutar (cualquier sistema operativo)
 
-**Opción rápida:** haz doble clic en [`Iniciar-Sitio.bat`](Iniciar-Sitio.bat). Instala las dependencias la primera vez, abre el servidor en una ventana aparte (título "Diamante - servidor") y **espera a que compile antes de abrir el navegador automáticamente** — la primera vez puede tardar 5-10 segundos, es normal. Para detener el sitio, cierra esa ventana del servidor.
+Requiere tener [Node.js](https://nodejs.org) 18.18 o superior instalado (`node --version` para revisar).
 
-**Desde VS Code (recomendado si vas a editar):**
+```bash
+git clone <URL-del-repositorio>
+cd diamante-selected-meats
+npm install
+npm run dev
+```
+
+Abre `http://localhost:3000` en tu navegador. Los cambios en el código se reflejan solos (hot reload). Para detener el servidor, presiona `Ctrl + C` en la terminal.
+
+## Cómo ejecutarlo (atajos)
+
+**Windows, doble clic:** [`Iniciar-Sitio.bat`](Iniciar-Sitio.bat). Instala las dependencias la primera vez, abre el servidor en una ventana aparte (título "Diamante - servidor") y **espera a que compile antes de abrir el navegador automáticamente** — la primera vez puede tardar 5-10 segundos, es normal. Para detener el sitio, cierra esa ventana del servidor.
+
+**Desde VS Code (cualquier sistema, recomendado si vas a editar):**
 1. Abre esta carpeta en VS Code (`Archivo → Abrir carpeta...`).
-2. Abre una terminal integrada (`Ctrl + ñ` o `Terminal → Nueva terminal`).
-3. La primera vez, instala dependencias:
-   ```
-   npm install
-   ```
-4. Arranca el sitio:
-   ```
-   npm run dev
-   ```
-5. Abre `http://localhost:3000` en tu navegador. Los cambios en el código se reflejan solos (hot reload).
-
-Para detener el servidor, presiona `Ctrl + C` en la terminal.
+2. Abre una terminal integrada (`` Ctrl + ` `` o `Terminal → Nueva terminal`).
+3. La primera vez, instala dependencias: `npm install`
+4. Arranca el sitio: `npm run dev`
+5. Abre `http://localhost:3000` en tu navegador.
 
 > Nota técnica: el sitio es una app Next.js/React (no un archivo `.html` suelto) porque usa animaciones avanzadas (Framer Motion, GSAP, scroll suave con Lenis) que requieren un proceso de compilación. Por eso se ejecuta con `npm run dev` en lugar de abrirse con doble clic directamente — pero una vez corriendo, se ve y se comporta exactamente igual que cualquier página web en el navegador.
 
@@ -35,20 +40,22 @@ components/
   LenisProvider.tsx       Scroll suave global
 lib/
   images.ts              Mapa centralizado de imágenes (locales y de stock)
-  videos.ts              Mapa centralizado de videos locales
+  videos.ts              Video de fondo del Hero
+  cuts.ts                Cortes del carrusel "Fire Selection" (nombre, foto, video opcional)
   motion.ts               Constantes y helpers de animación (Framer Motion)
   useMediaQuery.ts        Hooks de responsive / prefers-reduced-motion
 public/
   images/                Fotografías reales de Diamante
-  videos/                Videos reales de Diamante (Hero, Fire Selection, Daily Selection)
+  videos/                Videos reales de Diamante (Hero y cortes de Fire Selection)
 ```
 
 ## Reemplazar imágenes y videos
 
-Todo el contenido visual se controla desde dos archivos, no hace falta tocar los componentes:
+Todo el contenido visual se controla desde estos archivos, no hace falta tocar los componentes:
 
-- **Imágenes:** agrega el archivo a `public/images/` y actualiza su `url` en [`lib/images.ts`](lib/images.ts) (ej. `url: '/images/mi-foto.jpg'`).
-- **Videos:** agrega el archivo a `public/videos/` y actualiza su `src` en [`lib/videos.ts`](lib/videos.ts).
+- **Imágenes generales:** agrega el archivo a `public/images/` y actualiza su `url` en [`lib/images.ts`](lib/images.ts) (ej. `url: '/images/mi-foto.jpg'`).
+- **Video del Hero:** agrega el archivo a `public/videos/` y actualiza su `src` en [`lib/videos.ts`](lib/videos.ts).
+- **Cortes del carrusel "Fire Selection"** (nombre, descripción, foto y video opcional de cada corte): edita [`lib/cuts.ts`](lib/cuts.ts).
 
 Recomendaciones para videos de fondo: formato `.mp4` (H.264), sin audio o silenciado, idealmente menor a 8-10 MB para que cargue rápido.
 

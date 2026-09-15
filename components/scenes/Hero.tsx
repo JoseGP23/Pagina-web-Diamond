@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { videos } from '@/lib/videos';
 import Logo from '@/components/Logo';
@@ -17,9 +17,26 @@ const NAV_LINKS = [
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
-  const smokeActive = !reducedMotion;
 
   const stageRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  // El Hero es la primera escena visible, así que no se desmonta como las
+  // demás — sin este check, su video y sus loops infinitos (flotación,
+  // humo) seguían corriendo en segundo plano incluso al hacer scroll hacia
+  // Historia, compitiendo por el hilo principal justo en esa transición.
+  const inView = useInView(stageRef, { amount: 0.15 });
+  const smokeActive = !reducedMotion && inView;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (inView) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [inView]);
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springX = useSpring(mouseX, { stiffness: 100, damping: 18, mass: 0.4 });
@@ -88,7 +105,7 @@ export default function Hero() {
         <motion.div
           className="absolute inset-0"
           animate={
-            isMobile || reducedMotion
+            isMobile || reducedMotion || !inView
               ? undefined
               : { rotateZ: [-1.2, 1.2, -1.2], y: [0, -10, 0] }
           }
@@ -108,6 +125,7 @@ export default function Hero() {
             }
           >
             <video
+              ref={videoRef}
               className="absolute inset-0 h-full w-full object-cover contrast-[1.15] saturate-[1.25] brightness-[0.85]"
               src={videos.heroSteak.src}
               autoPlay
@@ -232,7 +250,7 @@ export default function Hero() {
         <motion.div
           className="h-10 w-px bg-gold/50"
           style={{ transformOrigin: 'top' }}
-          animate={reducedMotion ? {} : { scaleY: [0.2, 1, 0.2] }}
+          animate={reducedMotion || !inView ? {} : { scaleY: [0.2, 1, 0.2] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
         />
       </motion.div>

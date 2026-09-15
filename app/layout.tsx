@@ -3,9 +3,11 @@ import { Playfair_Display, Antonio } from 'next/font/google';
 import LenisProvider from '@/components/LenisProvider';
 import './globals.css';
 
+// Solo se cargan los pesos que el sitio realmente usa (400 y 500) — el
+// resto era peso muerto en la carga inicial y no se veía en ninguna parte.
 const playfair = Playfair_Display({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500'],
   variable: '--font-playfair',
   display: 'swap',
 });
@@ -14,7 +16,7 @@ const playfair = Playfair_Display({
 // editoriales/premium — reemplaza a Bebas Neue, que se sentía genérica.
 const antonio = Antonio({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500'],
   variable: '--font-condensed',
   display: 'swap',
 });

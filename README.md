@@ -15,9 +15,17 @@ npm run dev
 
 Abre `http://localhost:3000` en tu navegador. Los cambios en el código se reflejan solos (hot reload). Para detener el servidor, presiona `Ctrl + C` en la terminal.
 
-## Cómo ejecutarlo (atajos)
+## Cómo ejecutarlo (atajos de doble clic)
 
-**Windows, doble clic:** [`Iniciar-Sitio.bat`](Iniciar-Sitio.bat). Instala las dependencias la primera vez, abre el servidor en una ventana aparte (título "Diamante - servidor") y **espera a que compile antes de abrir el navegador automáticamente** — la primera vez puede tardar 5-10 segundos, es normal. Para detener el sitio, cierra esa ventana del servidor.
+Instalan las dependencias la primera vez (si hace falta), esperan a que el servidor esté realmente listo y **recién entonces** abren el navegador — así se evita ver una página en blanco por abrir demasiado pronto.
+
+| Sistema | Archivo |
+|---|---|
+| Windows | [`Iniciar-Sitio.bat`](Iniciar-Sitio.bat) — doble clic |
+| macOS | [`Iniciar-Sitio.command`](Iniciar-Sitio.command) — doble clic. La primera vez macOS puede bloquearlo ("desarrollador no identificado"): clic derecho → **Abrir** → **Abrir**, una sola vez. |
+| Linux | [`Iniciar-Sitio.sh`](Iniciar-Sitio.sh) — doble clic si tu gestor de archivos lo permite, o `./Iniciar-Sitio.sh` desde una terminal en esta carpeta |
+
+Todos dejan una ventana de terminal abierta con el servidor corriendo — ciérrala (o `Ctrl+C`) para detener el sitio.
 
 **Desde VS Code (cualquier sistema, recomendado si vas a editar):**
 1. Abre esta carpeta en VS Code (`Archivo → Abrir carpeta...`).

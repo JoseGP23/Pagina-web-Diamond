@@ -1,0 +1,6 @@
+# Los scripts de arranque deben mantener saltos de línea estilo Unix (LF)
+# siempre, sin importar el sistema operativo o la configuración de git de
+# quien los edite — un CRLF accidental rompe el "#!/usr/bin/env bash" en
+# macOS/Linux con un error de "bad interpreter".
+*.sh text eol=lf
+*.command text eol=lf

@@ -16,7 +16,7 @@ start "Diamante - servidor (no cerrar)" cmd /k npm run dev
 
 echo Esperando a que el servidor este listo (puede tardar unos segundos)...
 :waitloop
-powershell -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('localhost',3000); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>&1
+powershell -NoProfile -Command "try { $r = Invoke-WebRequest -Uri 'http://localhost:3000' -UseBasicParsing -TimeoutSec 2; if ($r.StatusCode -ne 200) { exit 1 } } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (
   timeout /t 1 /nobreak >nul
   goto waitloop

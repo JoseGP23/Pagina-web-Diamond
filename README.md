@@ -2,6 +2,24 @@
 
 Landing page premium en una sola página (scrollytelling) para Diamante Selected Meats.
 
+**Sitio en línea:** https://diamante-web.yellowglacier-a4d4342f.brazilsouth.azurecontainerapps.io
+
+## Despliegue en Azure
+
+El sitio corre en **Azure Container Apps** (grupo de recursos `diamante-rg`, región `brazilsouth`) con la imagen Docker que publica GitHub:
+
+1. Cada `git push` a `main` ejecuta el workflow [`.github/workflows/docker-image.yml`](.github/workflows/docker-image.yml). Ese workflow construye la imagen y la publica en `ghcr.io/josegp23/pagina-web-diamond`, con las etiquetas `latest` y el SHA del commit. La imagen se construye en GitHub porque la suscripción Azure for Students no permite construir imágenes dentro de Azure.
+2. Cuando el workflow termine (se ve en la pestaña **Actions** del repo), actualiza Azure con la nueva imagen:
+
+```bash
+az containerapp update --name diamante-web --resource-group diamante-rg --image ghcr.io/josegp23/pagina-web-diamond:<SHA-del-commit>
+```
+
+Usa el SHA del commit (`git rev-parse HEAD`) en vez de `latest`: así Azure crea una revisión nueva y descarga la imagen actualizada.
+
+- **Costo:** la app escala a 0 réplicas cuando nadie la visita, por eso consume muy poco crédito. La primera visita después de un rato sin tráfico tarda unos segundos más (arranque en frío). Para evitarlo: `az containerapp update -n diamante-web -g diamante-rg --min-replicas 1`, aunque eso sí consume crédito todo el tiempo.
+- **Apagarlo todo** (borra el sitio y sus recursos): `az group delete --name diamante-rg`
+
 ## Clonar y ejecutar (cualquier sistema operativo)
 
 Requiere tener [Node.js](https://nodejs.org) 18.18 o superior instalado (`node --version` para revisar).

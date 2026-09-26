@@ -41,3 +41,29 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      # Inicio de sesión sin contraseñas (OIDC): Azure confía en los tokens
+      # que GitHub emite solo para la rama main de este repo, mediante la
+      # identidad administrada "diamante-github-deployer" (rol Contributor
+      # únicamente sobre el grupo diamante-rg). Estos IDs no son secretos.
+      - uses: azure/login@v2
+        with:
+          client-id: 7d43815e-01a2-4d94-be79-92ad1a2df49f
+          tenant-id: c06fb559-1b68-4b84-a14f-47d0d837a5ab
+          subscription-id: e130c011-17eb-4341-a6e0-d8cdd27c51cc
+
+      - name: Actualizar Azure Container App
+        run: |
+          az extension add --name containerapp --upgrade --only-show-errors
+          az containerapp update \
+            --name diamante-web \
+            --resource-group diamante-rg \
+            --image ${{ env.IMAGE }}:${{ github.sha }} \
+            --query "properties.latestRevisionName" -o tsv

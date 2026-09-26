@@ -15,6 +15,32 @@ npm run dev
 
 Abre `http://localhost:3000` en tu navegador. Los cambios en el código se reflejan solos (hot reload). Para detener el servidor, presiona `Ctrl + C` en la terminal.
 
+## Ejecutar con Docker (sin instalar Node ni dependencias)
+
+El contenedor ya trae todo lo necesario: Node, las dependencias y el sitio compilado en modo producción. Solo necesitas [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows y macOS) o Docker Engine (Linux).
+
+**Atajo de doble clic:** [`Iniciar-Docker.bat`](Iniciar-Docker.bat) en Windows, o `./Iniciar-Docker.sh` en macOS y Linux. Construye la imagen, arranca el contenedor y abre el navegador cuando el sitio ya responde.
+
+**Manual:**
+
+```bash
+docker compose up -d --build
+```
+
+Abre `http://localhost:3000`. Para detenerlo: `docker compose down`.
+
+Sin Compose:
+
+```bash
+docker build -t diamante-web .
+docker run -d -p 3000:3000 --name diamante-web diamante-web
+```
+
+- La primera construcción tarda unos minutos y necesita internet, porque descarga dependencias y tipografías. Después, el contenedor funciona sin conexión, salvo las imágenes de stock de Unsplash y Picsum.
+- Para usar otro puerto, por ejemplo el 8080: `docker run -p 8080:3000 diamante-web`.
+- Si cambias el código, fotos o videos, vuelve a ejecutar `docker compose up -d --build` para regenerar la imagen.
+- Para desplegar en un servidor (VPS, Render, Railway, Fly.io, etc.), usa el mismo `Dockerfile`: la imagen escucha en el puerto `3000` (se puede cambiar con la variable `PORT`).
+
 ## Cómo ejecutarlo (atajos de doble clic)
 
 Instalan las dependencias la primera vez (si hace falta), esperan a que el servidor esté realmente listo y **recién entonces** abren el navegador — así se evita ver una página en blanco por abrir demasiado pronto.

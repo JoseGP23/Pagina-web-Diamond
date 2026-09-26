@@ -53,6 +53,9 @@ jobs:
       # que GitHub emite solo para la rama main de este repo, mediante la
       # identidad administrada "diamante-github-deployer" (rol Contributor
       # únicamente sobre el grupo diamante-rg). Estos IDs no son secretos.
+      # El subject de la credencial federada usa el formato con IDs numéricos
+      # que emite GitHub: repo:JoseGP23@322323627/Pagina-web-Diamond@1371674409:ref:refs/heads/main
+      # (si se renombra el repo o la rama, hay que actualizarlo en Azure).
       - uses: azure/login@v2
         with:
           client-id: 7d43815e-01a2-4d94-be79-92ad1a2df49f

@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
+import { VIEWPORT_REPEAT, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, CutIcon, SmokeIcon, HandshakeIcon, ShieldCheckIcon } from '@/components/Icons';
+import IconFeatureRow from '@/components/IconFeatureRow';
 
 const FEATURES = [
   { icon: <DiamondIcon />, label: 'SELECCIÓN PREMIUM' },
@@ -19,79 +20,94 @@ export default function ChefScene() {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <section id="chef-program" className="relative flex h-screen w-full flex-col overflow-hidden bg-charcoal md:flex-row">
-      <motion.div
-        className="relative h-1/2 w-full md:h-full md:w-1/2"
-        initial={{ opacity: 0, x: reducedMotion ? 0 : -60 }}
-        whileInView={{ opacity: 1, x: 0 }}
+    <section
+      id="chef-program"
+      className="relative grid min-h-svh w-full overflow-hidden bg-charcoal md:grid-cols-2"
+    >
+      {/* Split-screen: una cortina carbón se retira hacia la derecha y
+          descubre la foto (transform, no clip-path: un clip-path total hace
+          que el navegador crea que la imagen es invisible y no la cargue). */}
+      <m.div
+        className="relative h-[50svh] w-full overflow-hidden md:h-auto"
+        initial="hidden"
+        whileInView="visible"
         viewport={VIEWPORT_REPEAT}
-        transition={{ duration: 0.9, ease: CINEMATIC_EASE }}
       >
-        <Image
-          src={images.chefProgram.url}
-          alt={images.chefProgram.alt}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-          placeholder="blur"
-          blurDataURL={images.chefProgram.blurDataURL}
-          loading="lazy"
+        <m.div
+          className="absolute inset-0"
+          variants={
+            reducedMotion
+              ? undefined
+              : {
+                  hidden: { transform: 'scale(1.12)' },
+                  visible: { transform: 'scale(1)', transition: { duration: 1.4, ease: CINEMATIC_EASE } },
+                }
+          }
+        >
+          <Image
+            src={images.chefProgram.url}
+            alt={images.chefProgram.alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+            placeholder="blur"
+            blurDataURL={images.chefProgram.blurDataURL}
+            loading="lazy"
+          />
+        </m.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-charcoal/60" />
+        <m.span
+          aria-hidden="true"
+          className="absolute inset-0 origin-right bg-charcoal"
+          variants={
+            reducedMotion
+              ? {
+                  hidden: { opacity: 1 },
+                  visible: { opacity: 0, transition: { duration: 0.5 } },
+                }
+              : {
+                  hidden: { transform: 'scaleX(1)' },
+                  visible: { transform: 'scaleX(0)', transition: { duration: 1.1, ease: CINEMATIC_EASE } },
+                }
+          }
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent md:bg-gradient-to-r" />
-      </motion.div>
+      </m.div>
 
-      <motion.div
-        className="flex w-full flex-1 flex-col justify-center gap-8 px-6 py-10 sm:px-10 md:w-1/2 md:px-16"
-        initial={{ opacity: 0, x: reducedMotion ? 0 : 60 }}
-        whileInView={{ opacity: 1, x: 0 }}
+      <m.div
+        className="flex flex-col justify-center gap-12 px-6 py-16 sm:px-10 md:px-14 lg:px-20"
+        variants={staggerContainer(0.08, 0.15)}
+        initial="hidden"
+        whileInView="visible"
         viewport={VIEWPORT_REPEAT}
-        transition={{ duration: 0.9, ease: CINEMATIC_EASE, delay: 0.1 }}
       >
         <div>
-          <p className="mb-4 font-condensed text-xs tracking-[0.4em] text-gold">CHEF PROGRAM</p>
-          <h2 className="max-w-lg font-serif text-3xl italic leading-tight text-bone sm:text-4xl">
+          <m.h2 className="mb-6 font-condensed text-[12px] tracking-[0.35em] text-gold" variants={revealVariants(reducedMotion)}>
+            CHEF PROGRAM
+          </m.h2>
+          <m.p
+            className="max-w-[18ch] font-serif text-[clamp(2.25rem,4vw,3.5rem)] font-medium leading-[1.04] text-bone"
+            variants={revealVariants(reducedMotion)}
+          >
             Soluciones premium para restaurantes y profesionales.
-          </h2>
-          <p className="mt-4 max-w-md font-serif text-lg text-bone/80">
+          </m.p>
+          <m.p
+            className="mt-6 max-w-[40ch] font-serif text-xl leading-relaxed text-bone/80"
+            variants={revealVariants(reducedMotion)}
+          >
             Ofrecemos selección, cortes especiales y programas a la medida para elevar cada
             experiencia gastronómica.
-          </p>
+          </m.p>
         </div>
 
-        <motion.div
-          className="grid grid-cols-2 gap-6 sm:grid-cols-3"
-          variants={staggerContainer(0.12)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT_REPEAT}
-        >
-          {FEATURES.map((f, i) => (
-            <motion.div
-              key={i}
-              className="flex flex-col items-start gap-2"
-              variants={{
-                hidden: { opacity: 0, y: reducedMotion ? 0 : 18 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: CINEMATIC_EASE } },
-              }}
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/30 p-2.5 text-gold">
-                {f.icon}
-              </span>
-              <span className="font-condensed text-xs tracking-[0.1em] text-bone/80">{f.label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
+        <IconFeatureRow items={FEATURES} columns={2} />
 
-        <motion.p
-          className="font-condensed text-xs tracking-[0.35em] text-bone/60"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={VIEWPORT_REPEAT}
-          transition={{ duration: 0.8, delay: 0.3 }}
+        <m.p
+          className="font-serif text-2xl italic text-gold"
+          variants={revealVariants(reducedMotion)}
         >
-          TU VISIÓN, NUESTRA CARNE.
-        </motion.p>
-      </motion.div>
+          Tu visión, nuestra carne.
+        </m.p>
+      </m.div>
     </section>
   );
 }

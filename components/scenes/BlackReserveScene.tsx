@@ -1,13 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { images } from '@/lib/images';
 import { VIEWPORT_REPEAT, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, ClockIcon, StarIcon, TargetIcon, HeartHandIcon } from '@/components/Icons';
-import IconBadge from '@/components/IconBadge';
+import IconFeatureRow from '@/components/IconFeatureRow';
 
+// Black Reserve va más lento y suave que el resto: es la escena de mayor exclusividad.
 const SLOW_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const FEATURES = [
@@ -20,8 +21,20 @@ const FEATURES = [
 export default function BlackReserveScene() {
   const reducedMotion = usePrefersReducedMotion();
 
+  const slowReveal = reducedMotion
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.6 } } }
+    : {
+        hidden: { opacity: 0, transform: 'translateY(20px)', filter: 'blur(6px)' },
+        visible: {
+          opacity: 1,
+          transform: 'translateY(0px)',
+          filter: 'blur(0px)',
+          transition: { duration: 1.3, ease: SLOW_EASE },
+        },
+      };
+
   return (
-    <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-charcoal">
+    <section className="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-charcoal py-24">
       <div className="absolute inset-0">
         <Image
           src={images.blackReserve.url}
@@ -33,91 +46,68 @@ export default function BlackReserveScene() {
           blurDataURL={images.blackReserve.blurDataURL}
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-charcoal/70" />
+        <div className="absolute inset-0 bg-charcoal/80" />
       </div>
 
-      {/* Efecto spotlight radial que se enciende al entrar en viewport */}
-      {!reducedMotion && (
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[70vh] w-[70vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/25 blur-[100px]"
-          initial={{ opacity: 0, scale: 0.4 }}
-          whileInView={{ opacity: 0.6, scale: 1 }}
+      {/* Spotlight: un degradado radial que se enciende (opacidad + escala).
+          Sin filter: blur, así pintarlo cuesta casi nada. */}
+      {/* El centrado va en un contenedor aparte: Framer Motion escribe el
+          `transform` del spotlight y pisaría un translate de Tailwind. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <m.div
+          className="h-[110vmin] w-[110vmin] shrink-0"
+          style={{ background: 'radial-gradient(circle, rgba(201,168,118,0.28) 0%, rgba(201,168,118,0.08) 35%, rgba(201,168,118,0) 65%)' }}
+          initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.6 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={VIEWPORT_REPEAT}
           transition={{ duration: 2, ease: SLOW_EASE }}
-          style={{ willChange: 'transform, opacity' }}
         />
-      )}
-
-      <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center gap-10 px-6 text-center">
-        <motion.div
-          className="relative flex flex-col items-center gap-4"
-          initial={{ opacity: 0, y: reducedMotion ? 0 : 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={VIEWPORT_REPEAT}
-          transition={{ duration: 1.2, ease: SLOW_EASE }}
-        >
-          <span className="relative text-gold">
-            <DiamondIcon className="h-14 w-14" />
-            {!reducedMotion && (
-              <motion.span
-                className="absolute inset-0 overflow-hidden"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={VIEWPORT_REPEAT}
-              >
-                <motion.span
-                  className="absolute -inset-y-4 -left-10 w-6 skew-x-[-20deg] bg-bone/70"
-                  initial={{ x: '-40px' }}
-                  whileInView={{ x: '90px' }}
-                  viewport={VIEWPORT_REPEAT}
-                  transition={{ duration: 0.9, delay: 0.6, ease: 'easeInOut' }}
-                  style={{ willChange: 'transform' }}
-                />
-              </motion.span>
-            )}
-          </span>
-          <p className="font-condensed text-xs tracking-[0.45em] text-gold">BLACK RESERVE</p>
-          <h2 className="max-w-xl font-serif text-3xl italic leading-tight text-bone sm:text-5xl">
-            Nuestra selección más exclusiva.
-          </h2>
-          <p className="max-w-lg font-serif text-lg text-bone/80">
-            Cortes premium de alto marmoleo y procesos especiales para quienes buscan lo
-            extraordinario.
-          </p>
-        </motion.div>
-
-        <motion.div
-          className="grid grid-cols-2 gap-8 sm:grid-cols-4"
-          variants={staggerContainer(0.2, 0.3)}
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT_REPEAT}
-        >
-          {FEATURES.map((f, i) => (
-            <motion.div
-              key={i}
-              className="flex flex-col items-center gap-3"
-              variants={{
-                hidden: { opacity: 0, y: reducedMotion ? 0 : 16 },
-                visible: { opacity: 1, y: 0, transition: { duration: 1, ease: SLOW_EASE } },
-              }}
-            >
-              <IconBadge icon={f.icon} />
-              <span className="font-condensed text-xs tracking-[0.15em] text-bone/80">{f.label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.p
-          className="font-condensed text-xs tracking-[0.35em] text-bone/60"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={VIEWPORT_REPEAT}
-          transition={{ duration: 1, delay: 0.6 }}
-        >
-          EXCLUSIVIDAD • CALIDAD • PRESTIGIO
-        </motion.p>
       </div>
+
+      <m.div
+        className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center px-6 text-center"
+        variants={staggerContainer(0.12)}
+        initial="hidden"
+        whileInView="visible"
+        viewport={VIEWPORT_REPEAT}
+      >
+        <m.span className="relative mb-8 block overflow-hidden text-gold" variants={slowReveal}>
+          <DiamondIcon className="h-14 w-14" />
+          {/* Destello: una sola pasada al entrar, no un loop */}
+          {reducedMotion ? null : (
+            <m.span
+              aria-hidden="true"
+              className="absolute -inset-y-4 left-0 w-5 skew-x-[-20deg] bg-bone/70"
+              variants={{
+                hidden: { transform: 'translateX(-40px) skewX(-20deg)' },
+                visible: {
+                  transform: 'translateX(90px) skewX(-20deg)',
+                  transition: { duration: 0.9, delay: 0.9, ease: [0.77, 0, 0.175, 1] },
+                },
+              }}
+            />
+          )}
+        </m.span>
+        <m.h2 className="font-condensed text-[12px] tracking-[0.45em] text-gold" variants={slowReveal}>
+          BLACK RESERVE
+        </m.h2>
+        <m.p
+          className="mt-6 font-serif text-[clamp(2.5rem,5.4vw,4.75rem)] font-medium italic leading-[1.02] text-bone"
+          variants={slowReveal}
+        >
+          Nuestra selección más exclusiva.
+        </m.p>
+        <m.p className="mt-6 max-w-[42ch] font-serif text-xl leading-relaxed text-bone/80" variants={slowReveal}>
+          Cortes premium de alto marmoleo y procesos especiales para quienes buscan lo
+          extraordinario.
+        </m.p>
+
+        <IconFeatureRow items={FEATURES} className="mt-14 w-full text-left" />
+
+        <m.p className="mt-12 font-condensed text-[12px] tracking-[0.35em] text-bone/55" variants={slowReveal}>
+          EXCLUSIVIDAD • CALIDAD • PRESTIGIO
+        </m.p>
+      </m.div>
     </section>
   );
 }

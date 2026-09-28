@@ -1,51 +1,59 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
+import { m } from 'framer-motion';
+import { VIEWPORT_REPEAT, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
-import IconBadge from '@/components/IconBadge';
 
 export type FeatureItem = {
   icon: React.ReactNode;
   label: string;
 };
 
+const COLUMNS = {
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-4',
+  5: 'sm:grid-cols-3 lg:grid-cols-5',
+} as const;
+
+/**
+ * Atributos de cada escena: ícono de trazo fino + etiqueta, sobre una línea
+ * divisoria. Son información, no botones, así que no reaccionan al hover.
+ * Entran con un stagger corto (60ms) para leerse como un solo grupo.
+ */
 export default function IconFeatureRow({
   items,
   accent = 'gold',
+  columns = 4,
+  className = '',
 }: {
   items: FeatureItem[];
   accent?: 'gold' | 'fire';
+  columns?: keyof typeof COLUMNS;
+  className?: string;
 }) {
   const reducedMotion = usePrefersReducedMotion();
+  const itemVariants = revealVariants(reducedMotion);
 
   return (
-    <motion.div
-      className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8"
-      variants={staggerContainer(0.12)}
+    <m.ul
+      className={`grid grid-cols-2 gap-x-6 gap-y-5 border-t border-bone/15 pt-6 ${COLUMNS[columns]} ${className}`}
+      variants={staggerContainer(0.06, 0.1)}
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT_REPEAT}
     >
-      {items.map((item, i) => (
-        <motion.div
-          key={i}
-          className="flex flex-col items-center gap-3 text-center"
-          variants={{
-            hidden: { opacity: 0, y: reducedMotion ? 0 : 20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.6, ease: CINEMATIC_EASE },
-            },
-          }}
-        >
-          <IconBadge icon={item.icon} accent={accent} />
-          <span className="font-condensed text-xs tracking-[0.15em] text-bone/80 sm:text-sm">
-            {item.label}
+      {items.map((item) => (
+        <m.li key={item.label} className="flex items-center gap-3" variants={itemVariants}>
+          <span
+            aria-hidden="true"
+            className={`h-5 w-5 shrink-0 ${accent === 'fire' ? 'text-fire' : 'text-gold'}`}
+          >
+            {item.icon}
           </span>
-        </motion.div>
+          <span className="font-condensed text-[12px] tracking-[0.18em] text-bone/85">{item.label}</span>
+        </m.li>
       ))}
-    </motion.div>
+    </m.ul>
   );
 }

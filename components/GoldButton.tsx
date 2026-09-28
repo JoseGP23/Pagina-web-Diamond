@@ -6,32 +6,31 @@ type GoldButtonProps = {
   className?: string;
 };
 
-const NOTCH = 14;
+const NOTCH = 12;
+const CLIP = `polygon(${NOTCH}px 0, 100% 0, 100% calc(100% - ${NOTCH}px), calc(100% - ${NOTCH}px) 100%, 0 100%, 0 ${NOTCH}px)`;
 
 /**
- * CTA con esquinas cortadas (evoca una etiqueta de carnicería) y un
- * relleno dorado que "barre" de izquierda a derecha al hacer hover, en vez
- * del cambio de color instantáneo de un botón genérico. Todo vía CSS
- * (transform + color), sin JS, para que sea barato de animar.
+ * CTA con esquinas cortadas (evoca una etiqueta de carnicería). Al pasar el
+ * mouse, un relleno dorado barre de izquierda a derecha. Al presionar, el
+ * botón se hunde levemente (scale 0.97) para confirmar el clic. Todo es CSS
+ * (transform + color), sin JS.
  */
 export default function GoldButton({ href, children, className = '' }: GoldButtonProps) {
   return (
     <a
       href={href}
-      className={`group relative inline-flex items-center gap-2 overflow-hidden border border-gold/60 px-6 py-3 font-condensed text-[12px] font-medium tracking-[0.15em] text-gold transition-colors active:scale-[0.97] ${className}`}
-      style={{
-        clipPath: `polygon(${NOTCH}px 0, 100% 0, 100% calc(100% - ${NOTCH}px), calc(100% - ${NOTCH}px) 100%, 0 100%, 0 ${NOTCH}px)`,
-      }}
+      className={`group relative inline-flex min-h-[48px] items-center overflow-hidden px-7 font-condensed text-[13px] font-medium uppercase tracking-[0.2em] text-gold transition-transform duration-150 ease-out active:scale-[0.97] ${className}`}
+      style={{ clipPath: CLIP }}
     >
+      {/* Borde dibujado con el mismo recorte: un `border` normal se cortaría en las esquinas */}
+      <span aria-hidden="true" className="absolute inset-0 bg-gold/50" style={{ clipPath: CLIP }} />
+      <span aria-hidden="true" className="absolute inset-px bg-charcoal/40 backdrop-blur-sm" style={{ clipPath: CLIP }} />
       <span
-        className="absolute inset-0 origin-left scale-x-0 bg-gold transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100"
         aria-hidden="true"
+        className="absolute inset-0 origin-left scale-x-0 bg-gold transition-transform duration-[400ms] ease-out group-hover:scale-x-100"
       />
-      <span className="relative z-10 transition-colors duration-300 group-hover:text-charcoal">
+      <span className="relative z-10 transition-colors duration-200 ease-out group-hover:text-charcoal">
         {children}
-      </span>
-      <span className="relative z-10 transition-all duration-300 group-hover:translate-x-1 group-hover:text-charcoal">
-        →
       </span>
     </a>
   );

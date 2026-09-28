@@ -2,9 +2,9 @@
 
 import { useRef } from 'react';
 import Image from 'next/image';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE } from '@/lib/motion';
+import { VIEWPORT_REPEAT, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import IconFeatureRow from '@/components/IconFeatureRow';
 import { ClockIcon, CutIcon, StarIcon, FamilyIcon } from '@/components/Icons';
@@ -22,13 +22,23 @@ export default function DailyScene() {
   const isMobile = useIsMobile();
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const parallaxRange = reducedMotion ? [0, 0] : isMobile ? [-25, 25] : [-50, 50];
-  const y = useTransform(scrollYProgress, [0, 1], parallaxRange);
+  // Rangos fijos (useTransform se queda con los del primer render).
+  const yDesktop = useTransform(scrollYProgress, [0, 1], [-55, 55]);
+  const yMobile = useTransform(scrollYProgress, [0, 1], [-25, 25]);
+  const parallax = reducedMotion ? undefined : { y: isMobile ? yMobile : yDesktop };
+
+  // Esta escena entra de lado (desde la derecha) para diferenciarse de las verticales.
+  const slideIn = reducedMotion
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4 } } }
+    : {
+        hidden: { opacity: 0, transform: 'translateX(40px)' },
+        visible: { opacity: 1, transform: 'translateX(0px)', transition: { duration: 0.9, ease: CINEMATIC_EASE } },
+      };
 
   return (
-    <section ref={ref} className="relative flex h-screen w-full items-center overflow-hidden bg-charcoal">
+    <section ref={ref} className="relative flex min-h-svh w-full items-center overflow-hidden bg-charcoal py-24">
       <div className="absolute inset-0">
-        <motion.div style={{ y, willChange: 'transform' }} className="absolute -top-[10%] -bottom-[10%] inset-x-0">
+        <m.div style={parallax} className="absolute -inset-y-[10%] inset-x-0">
           <Image
             src={images.dailySelection.url}
             alt={images.dailySelection.alt}
@@ -39,31 +49,40 @@ export default function DailyScene() {
             blurDataURL={images.dailySelection.blurDataURL}
             loading="lazy"
           />
-        </motion.div>
-        <div className="scene-gradient-overlay absolute inset-0" />
+        </m.div>
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(270deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.65) 45%, rgba(10,10,10,0.25) 100%), linear-gradient(180deg, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0) 30%, rgba(10,10,10,0) 70%, rgba(10,10,10,0.75) 100%)',
+          }}
+        />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-end gap-12 px-6 text-right sm:px-10">
-        <motion.div
-          initial={{ opacity: 0, x: reducedMotion ? 0 : 80 }}
-          whileInView={{ opacity: 1, x: 0 }}
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-end gap-14 px-6 sm:px-10">
+        <m.div
+          className="flex max-w-2xl flex-col items-end text-right"
+          variants={staggerContainer(0.08)}
+          initial="hidden"
+          whileInView="visible"
           viewport={VIEWPORT_REPEAT}
-          transition={{ duration: 0.9, ease: CINEMATIC_EASE }}
-          className="flex flex-col items-end gap-4"
         >
-          <p className="font-condensed text-xs tracking-[0.4em] text-gold">DAILY SELECTION</p>
-          <h2 className="max-w-xl font-serif text-3xl italic leading-tight text-bone sm:text-5xl">
+          <m.h2 className="mb-6 font-condensed text-[12px] tracking-[0.35em] text-gold" variants={slideIn}>
+            DAILY SELECTION
+          </m.h2>
+          <m.p
+            className="font-serif text-[clamp(2.25rem,4.6vw,4rem)] font-medium leading-[1.02] text-bone"
+            variants={slideIn}
+          >
             Cortes versátiles para el día a día.
-          </h2>
-          <p className="max-w-lg font-serif text-lg text-bone/80">
+          </m.p>
+          <m.p className="mt-6 max-w-[40ch] font-serif text-xl leading-relaxed text-bone/80" variants={slideIn}>
             Seleccionamos opciones que se adaptan a tu cocina, brindando sabor, rendimiento y
             practicidad en cada preparación.
-          </p>
-        </motion.div>
+          </m.p>
+        </m.div>
 
-        <div className="w-full">
-          <IconFeatureRow items={FEATURES} />
-        </div>
+        <IconFeatureRow items={FEATURES} className="w-full max-w-2xl" />
       </div>
     </section>
   );

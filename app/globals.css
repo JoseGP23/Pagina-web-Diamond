@@ -6,6 +6,8 @@ html {
   position: relative;
   background-color: #0a0a0a;
   scroll-behavior: auto;
+  /* Evita que iOS agrande el texto al girar el teléfono */
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -13,6 +15,28 @@ body {
   background-color: #0a0a0a;
   color: #f5f0e8;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(201, 168, 118, 0.35);
+  color: #f5f0e8;
+}
+
+/* Foco visible solo con teclado, en el dorado de la marca */
+:focus-visible {
+  outline: 1px solid #c9a876;
+  outline-offset: 4px;
+}
+
+/* Titulares sin viudas: el navegador reparte las líneas */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
 }
 
 /* Lenis requerido: desactiva el smooth scroll nativo cuando Lenis controla el scroll */
@@ -29,19 +53,17 @@ html.lenis body {
   overflow: hidden;
 }
 
+/* Movimiento reducido: menos movimiento, no cero. Se quitan los loops y los
+   desplazamientos; los fades cortos se conservan porque ayudan a entender
+   qué cambió. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-.text-outline-gold {
-  -webkit-text-stroke: 1px #c9a876;
 }
 
 .scene-gradient-overlay {
@@ -52,4 +74,64 @@ html.lenis body {
     rgba(10, 10, 10, 0.55) 75%,
     rgba(10, 10, 10, 0.68) 100%
   );
+}
+
+/* ---------- Partículas (humo / chispas) ----------
+   Animaciones CSS puras: corren en el compositor, fuera del hilo principal,
+   así que no se traban mientras React o el scroll trabajan. El humo usa un
+   degradado radial en vez de `filter: blur()`, que es mucho más caro de pintar. */
+.particle {
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform, opacity;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+.particle-smoke {
+  bottom: -10%;
+  background: radial-gradient(circle, rgba(245, 240, 232, 0.16) 0%, rgba(245, 240, 232, 0) 70%);
+  animation-name: smoke-rise;
+}
+
+.particle-spark {
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  background: #e8b872;
+  box-shadow: 0 0 6px 1px rgba(232, 184, 114, 0.6);
+  animation-name: spark-rise;
+}
+
+.particles-paused .particle {
+  animation-play-state: paused;
+}
+
+@keyframes smoke-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.8);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), var(--rise), 0) scale(1.5);
+  }
+}
+
+@keyframes spark-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), var(--rise), 0);
+  }
 }

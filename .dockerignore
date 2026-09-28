@@ -16,3 +16,6 @@ Dockerfile
 docker-compose.yml
 Iniciar-*
 README.md
+
+# Video fuente del Hero (el sitio usa los fotogramas de public/hero-frames)
+media

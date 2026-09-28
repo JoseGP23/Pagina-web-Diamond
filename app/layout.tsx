@@ -1,19 +1,21 @@
-import type { Metadata } from 'next';
-import { Playfair_Display, Antonio } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Cormorant_Garamond, Antonio } from 'next/font/google';
 import LenisProvider from '@/components/LenisProvider';
+import MotionProvider from '@/components/MotionProvider';
 import './globals.css';
 
-// Solo se cargan los pesos que el sitio realmente usa (400 y 500) — el
-// resto era peso muerto en la carga inicial y no se veía en ninguna parte.
-const playfair = Playfair_Display({
+// Cormorant Garamond: serif de alto contraste y trazo fino, pensada para
+// tamaños grandes; se siente más de joyería/alta cocina que Playfair.
+// Solo los pesos y estilos que se usan.
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-playfair',
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
   display: 'swap',
 });
 
-// Antonio: condensa igual que una "impact" clásica pero con letras más
-// editoriales/premium — reemplaza a Bebas Neue, que se sentía genérica.
+// Antonio: condensada para categorías y microcopy en mayúsculas.
 const antonio = Antonio({
   subsets: ['latin'],
   weight: ['400', '500'],
@@ -26,11 +28,18 @@ export const metadata: Metadata = {
   description: 'Fire • Smoke • Selection. Alta cocina de cortes a la parrilla.',
 };
 
+export const viewport: Viewport = {
+  themeColor: '#0a0a0a',
+  colorScheme: 'dark',
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${playfair.variable} ${antonio.variable}`}>
-      <body className="bg-charcoal font-sans antialiased">
-        <LenisProvider>{children}</LenisProvider>
+    <html lang="es" className={`${cormorant.variable} ${antonio.variable}`}>
+      <body className="bg-charcoal font-serif antialiased">
+        <MotionProvider>
+          <LenisProvider>{children}</LenisProvider>
+        </MotionProvider>
       </body>
     </html>
   );

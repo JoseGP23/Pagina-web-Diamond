@@ -90,34 +90,56 @@ components/
   scenes/                Una escena por sección de la página (Hero, Historia, Fire Selection, ...)
   Icons.tsx, Logo.tsx     Iconos e isotipo en SVG
   IconFeatureRow.tsx      Fila de iconos reutilizable
-  SmokeParticles.tsx      Sistema de partículas (humo/chispas)
+  SmokeParticles.tsx      Sistema de partículas (humo/chispas), 100% CSS
   LenisProvider.tsx       Scroll suave global
+  MotionProvider.tsx      Carga diferida de Framer Motion (LazyMotion)
 lib/
   images.ts              Mapa centralizado de imágenes (locales y de stock)
-  videos.ts              Video de fondo del Hero
+  heroFrames.ts          Secuencia de fotogramas del Hero (cantidad y rutas)
+  useFrameSequence.ts    Dibuja en un canvas el fotograma que toca según el scroll
   cuts.ts                Cortes del carrusel "Fire Selection" (nombre, foto, video opcional)
-  motion.ts               Constantes y helpers de animación (Framer Motion)
+  motion.ts               Curvas y variantes de animación compartidas
   useMediaQuery.ts        Hooks de responsive / prefers-reduced-motion
+media/
+  hero.mp4               Video original del Hero (fuente de los fotogramas, no se publica)
 public/
+  hero-frames/           Fotogramas del Hero: desktop/ (horizontal) y mobile/ (vertical)
   images/                Fotografías reales de Diamante
-  videos/                Videos reales de Diamante (Hero y cortes de Fire Selection)
+  videos/                Videos de los cortes de Fire Selection
 ```
+
+## Cómo funciona el Hero
+
+El Hero se queda fijo mientras bajas y el scroll mueve la "cámara" del video: plano abierto con el titular, acercamiento a las llamas y cierre con la firma DIAMANTE. No es un `<video>`: son 61 fotogramas WebP que se dibujan en un `<canvas>` según la posición del scroll, mezclando dos fotogramas vecinos para que se vea fluido. Adelantar un video con el scroll se traba en muchos navegadores, sobre todo en iPhone.
+
+- El primer fotograma está en el HTML, así que se ve de inmediato. Los demás se descargan en orden "de grueso a fino": primero el inicial y el final, luego el del medio, y así. El scroll funciona desde los primeros KB.
+- En celular se usan fotogramas verticales más livianos (`mobile/`, ~1.9 MB en total; escritorio ~3.1 MB).
+- Con movimiento reducido activado, el Hero es una pantalla fija con el primer fotograma y el titular.
+- Los tramos de cada capítulo están al inicio de [`components/scenes/Hero.tsx`](components/scenes/Hero.tsx) (`CHAPTER_1`, `CHAPTER_2`, `CHAPTER_3_START`). La altura del recorrido está en la clase `h-[320svh] md:h-[400svh]` de la misma sección.
 
 ## Reemplazar imágenes y videos
 
 Todo el contenido visual se controla desde estos archivos, no hace falta tocar los componentes:
 
 - **Imágenes generales:** agrega el archivo a `public/images/` y actualiza su `url` en [`lib/images.ts`](lib/images.ts) (ej. `url: '/images/mi-foto.jpg'`).
-- **Video del Hero:** agrega el archivo a `public/videos/` y actualiza su `src` en [`lib/videos.ts`](lib/videos.ts).
+- **Video del Hero:** reemplaza `media/hero.mp4` y regenera los fotogramas con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto (borra antes el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile`):
+
+  ```bash
+  ffmpeg -i media/hero.mp4 -vf "fps=12,crop=1764:1040:0:0,eq=contrast=1.08:saturation=1.12:brightness=-0.02,scale=1280:-2:flags=lanczos" -c:v libwebp -quality 62 -compression_level 6 public/hero-frames/desktop/%03d.webp
+  ffmpeg -i media/hero.mp4 -vf "fps=12,crop=600:1040:582:0,eq=contrast=1.08:saturation=1.12:brightness=-0.02" -c:v libwebp -quality 52 -compression_level 6 public/hero-frames/mobile/%03d.webp
+  ```
+
+  Los valores de `crop` son para un video de 1764×1176: recortan la marca de agua de abajo y, en celular, toman la franja central vertical. Ajústalos si el video nuevo mide distinto. Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts).
 - **Cortes del carrusel "Fire Selection"** (nombre, descripción, foto y video opcional de cada corte): edita [`lib/cuts.ts`](lib/cuts.ts).
 
 Recomendaciones para videos de fondo: formato `.mp4` (H.264), sin audio o silenciado, idealmente menor a 8-10 MB para que cargue rápido.
 
 ## Si las animaciones se sienten lentas en un dispositivo real
 
-- Revisa que el video no pese demasiado (compresión con HandBrake o similar, apuntando a 720p/1080p y bitrate moderado).
-- En `lib/motion.ts`, reduce `CINEMATIC_EASE`/duraciones o el rango de parallax en cada escena (`parallaxRange` dentro de cada archivo en `components/scenes/`).
-- En `components/SmokeParticles.tsx`, baja el número de partículas (`intensity`).
+- Revisa que los videos de los cortes no pesen demasiado (compresión con HandBrake o similar, apuntando a 720p/1080p y bitrate moderado).
+- Si el Hero tarda en suavizarse con conexiones lentas, baja la calidad de los fotogramas (`-quality` en los comandos de ffmpeg de arriba) o usa `fps=10`.
+- En `lib/motion.ts`, ajusta las curvas o duraciones; el rango de parallax está dentro de cada escena en `components/scenes/` (`yDesktop` / `yMobile`).
+- En `components/SmokeParticles.tsx`, baja el número de partículas (`COUNTS`).
 - Confirma que `prefers-reduced-motion` esté simplificando correctamente la escena afectada (ya está implementado en todas).
 - El sitio ya reduce automáticamente la complejidad en pantallas ≤768px (`useIsMobile`) — si sigue lento en un celular real, considera bajar aún más esos umbrales.
 

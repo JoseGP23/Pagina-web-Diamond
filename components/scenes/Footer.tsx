@@ -1,71 +1,74 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { images } from '@/lib/images';
 import { VIEWPORT_REPEAT, CINEMATIC_EASE } from '@/lib/motion';
 import Logo from '@/components/Logo';
 
+const CONTACT_LINKS = [
+  { label: 'WhatsApp', value: '+57 300 000 0000', href: 'https://wa.me/573000000000' },
+  { label: 'Instagram', value: '@diamante.meats', href: 'https://instagram.com/diamante.meats' },
+];
+
 export default function Footer() {
   return (
-    <footer id="contacto" className="relative w-full border-t border-bone/10 bg-charcoal-light px-6 py-14 sm:px-10 lg:px-16">
-      <motion.div
-        className="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-10 lg:flex-row lg:items-center"
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
+    <footer id="contacto" className="relative w-full border-t border-bone/10 bg-charcoal-light px-6 pb-10 pt-20 sm:px-10 lg:px-16">
+      <m.div
+        className="mx-auto grid w-full max-w-6xl gap-14 lg:grid-cols-[1.4fr_1fr] lg:items-end"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={VIEWPORT_REPEAT}
-        transition={{ duration: 0.8, ease: CINEMATIC_EASE }}
+        transition={{ duration: 0.9, ease: CINEMATIC_EASE }}
       >
-        <div className="flex items-center gap-4 text-gold">
-          <Logo className="h-11 w-11" />
-          <div className="flex flex-col leading-none">
-            <span className="font-serif text-2xl tracking-wide text-bone">
-              DIAMANTE<sup className="ml-0.5 text-xs align-super">®</sup>
-            </span>
-            <span className="mt-1 font-condensed text-[10px] tracking-[0.4em] text-bone/50">
-              SELECTED MEATS
-            </span>
-            <span className="mt-2 font-condensed text-[10px] tracking-[0.4em] text-gold">
-              FIRE • SMOKE • SELECTION
-            </span>
+        <div>
+          <div className="flex items-center gap-4 text-gold">
+            <Logo className="h-11 w-11" />
+            <span className="font-condensed text-[11px] tracking-[0.4em] text-gold">FIRE • SMOKE • SELECTION</span>
           </div>
+          <p className="mt-8 font-serif text-[clamp(3rem,8vw,6.5rem)] font-medium leading-none tracking-[0.12em] text-bone">
+            DIAMANTE<sup className="ml-1 align-super text-[0.25em] tracking-normal text-bone/60">®</sup>
+          </p>
+          <p className="mt-3 font-condensed text-[12px] tracking-[0.4em] text-bone/50">SELECTED MEATS</p>
         </div>
 
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-10">
-          <div className="flex flex-col gap-3 font-serif text-base text-bone/85">
-            <a
-              href="https://wa.me/573000000000"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-gold"
-            >
-              WhatsApp — +57 300 000 0000
-            </a>
-            <a
-              href="https://instagram.com/diamante.meats"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-gold"
-            >
-              @diamante.meats
-            </a>
-            <span>Colombia</span>
-          </div>
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between lg:justify-end lg:gap-12">
+          <ul className="flex flex-col gap-4">
+            {CONTACT_LINKS.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col gap-1"
+                >
+                  <span className="font-condensed text-[11px] tracking-[0.3em] text-bone/50">{link.label.toUpperCase()}</span>
+                  <span className="font-serif text-2xl text-bone transition-colors duration-200 ease-out group-hover:text-gold">
+                    {link.value}
+                  </span>
+                </a>
+              </li>
+            ))}
+            <li className="flex flex-col gap-1">
+              <span className="font-condensed text-[11px] tracking-[0.3em] text-bone/50">UBICACIÓN</span>
+              <span className="font-serif text-2xl text-bone">Colombia</span>
+            </li>
+          </ul>
 
-          <div className="overflow-hidden rounded-lg border border-gold/20">
+          <div className="w-fit border border-gold/20 p-2">
             <Image
               src={images.qrPlaceholder.url}
               alt={images.qrPlaceholder.alt}
               width={96}
               height={96}
-              className="opacity-90"
+              className="block opacity-90"
               loading="lazy"
             />
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
-      <p className="mx-auto mt-10 w-full max-w-6xl border-t border-bone/10 pt-6 text-center font-condensed text-[10px] tracking-[0.3em] text-bone/30 sm:text-left">
+      <p className="mx-auto mt-16 w-full max-w-6xl border-t border-bone/10 pt-6 font-condensed text-[11px] tracking-[0.3em] text-bone/40">
         © {new Date().getFullYear()} DIAMANTE SELECTED MEATS
       </p>
     </footer>

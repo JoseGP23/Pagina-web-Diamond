@@ -6,7 +6,9 @@ import { AnimatePresence, m, useInView, type PanInfo } from 'framer-motion';
 import { CUTS } from '@/lib/cuts';
 import { CINEMATIC_EASE, EASE_OUT, VIEWPORT_REPEAT, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
-import { FlameIcon } from '@/components/Icons';
+import { FlameIcon, WhatsAppIcon } from '@/components/Icons';
+import GoldButton from '@/components/GoldButton';
+import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 import IconBadge from '@/components/IconBadge';
 import SmokeParticles from '@/components/SmokeParticles';
 
@@ -231,14 +233,26 @@ export default function FireSelectionScene() {
                     {cut.name}
                   </h3>
                   <p className="mt-3 max-w-[34ch] font-serif text-lg text-bone/75 sm:text-xl">{cut.description}</p>
+                  {/* El texto de la diapositiva no recibe clics (para no estorbar el
+                      arrastre); solo el botón de pedido los vuelve a activar. */}
+                  <div className="pointer-events-auto mt-6">
+                    <GoldButton
+                      href={whatsappLink(orderCutMessage(cut.name))}
+                      external
+                      icon={<WhatsAppIcon className="h-4 w-4" />}
+                    >
+                      Pedir {cut.name}
+                    </GoldButton>
+                  </div>
                 </m.div>
               </AnimatePresence>
             </div>
           </m.div>
 
-          {/* Controles */}
+          {/* Controles. En celular las flechas van a la izquierda: a la derecha
+              queda el botón flotante de WhatsApp y las taparía. */}
           <div className="mt-5 flex items-center justify-between gap-4">
-            <p className="whitespace-nowrap font-condensed text-[13px] tracking-[0.3em] text-bone/60">
+            <p className="order-last whitespace-nowrap font-condensed sm:order-none text-[13px] tracking-[0.3em] text-bone/60">
               <span className="text-gold">{pad(index + 1)}</span> / {pad(CUTS.length)}
             </p>
 
@@ -273,7 +287,7 @@ export default function FireSelectionScene() {
               })}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="order-first flex items-center gap-2 sm:order-none">
               {(['left', 'right'] as const).map((dir) => (
                 <button
                   key={dir}

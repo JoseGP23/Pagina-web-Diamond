@@ -26,8 +26,8 @@ export const images: Record<string, SceneImage> = {
     blurDataURL: GENERIC_BLUR,
   },
   historia: {
-    url: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Campo dorado al atardecer, origen de la tradición familiar Diamante',
+    url: 'https://images.unsplash.com/photo-1763062690254-be377d55dacf?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Asado en el patio de noche: cortes sobre la parrilla encendida',
     blurDataURL: GENERIC_BLUR,
   },
   dailySelection: {

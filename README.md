@@ -117,6 +117,16 @@ El Hero se queda fijo mientras bajas y el scroll mueve la "cámara" del video: p
 - Con movimiento reducido activado, el Hero es una pantalla fija con el primer fotograma y el titular.
 - Los tramos de cada capítulo están al inicio de [`components/scenes/Hero.tsx`](components/scenes/Hero.tsx) (`CHAPTER_1`, `CHAPTER_2`, `CHAPTER_3_START`). La altura del recorrido está en la clase `h-[320svh] md:h-[400svh]` de la misma sección.
 
+## Compras por WhatsApp
+
+Todos los botones de compra abren un chat de WhatsApp Business con un mensaje ya escrito:
+
+- **Comprar por WhatsApp** en el Hero y en el botón flotante (abajo a la derecha, visible en todo el sitio).
+- **Pedir {corte}** en cada diapositiva de Fire Selection; el mensaje incluye el nombre del corte.
+- El enlace de WhatsApp del footer.
+
+El número y los mensajes están en [`lib/whatsapp.ts`](lib/whatsapp.ts): cambia `WHATSAPP_NUMBER` (solo dígitos con código de país, ej. `573001234567`) y `WHATSAPP_DISPLAY` (cómo se muestra en el footer).
+
 ## Reemplazar imágenes y videos
 
 Todo el contenido visual se controla desde estos archivos, no hace falta tocar los componentes:

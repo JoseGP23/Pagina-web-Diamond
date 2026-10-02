@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import Hero from '@/components/scenes/Hero';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 const sceneLoading = <div className="h-screen w-full bg-charcoal" />;
 
@@ -36,6 +37,7 @@ export default function Home() {
       <ChefScene />
       <BlackReserveScene />
       <Footer />
+      <WhatsAppButton />
     </main>
   );
 }

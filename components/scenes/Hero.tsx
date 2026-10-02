@@ -6,6 +6,8 @@ import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { useFrameSequence } from '@/lib/useFrameSequence';
 import { frameSrc } from '@/lib/heroFrames';
 import GoldButton from '@/components/GoldButton';
+import { WhatsAppIcon } from '@/components/Icons';
+import { whatsappLink } from '@/lib/whatsapp';
 
 const NAV_LINKS = [
   { label: 'Historia', href: '#historia' },
@@ -221,7 +223,9 @@ export default function Hero() {
               Selección curada de cortes premium para quienes reconocen la diferencia.
             </p>
             <div className="hero-line [animation-delay:520ms]">
-              <GoldButton href="#fire-selection">Ver la selección</GoldButton>
+              <GoldButton href={whatsappLink()} external icon={<WhatsAppIcon className="h-4 w-4" />}>
+                Comprar por WhatsApp
+              </GoldButton>
             </div>
           </div>
         </m.div>
@@ -285,7 +289,7 @@ export default function Hero() {
             </div>
 
             {/* Progreso del recorrido + pista de scroll */}
-            <div aria-hidden="true" className="absolute bottom-10 right-6 z-10 hidden flex-col items-center gap-3 md:flex lg:right-10">
+            <div aria-hidden="true" className="absolute right-6 top-1/2 z-10 hidden -translate-y-1/2 flex-col items-center gap-3 md:flex lg:right-10">
               <m.span className="font-condensed text-[10px] tracking-[0.4em] text-bone/60" style={{ opacity: hint }}>
                 DESLIZA
               </m.span>

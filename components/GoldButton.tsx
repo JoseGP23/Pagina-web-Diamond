@@ -4,6 +4,9 @@ type GoldButtonProps = {
   href: string;
   children: ReactNode;
   className?: string;
+  /** Abre en otra pestaña/app (enlaces de WhatsApp). */
+  external?: boolean;
+  icon?: ReactNode;
 };
 
 const NOTCH = 12;
@@ -15,10 +18,11 @@ const CLIP = `polygon(${NOTCH}px 0, 100% 0, 100% calc(100% - ${NOTCH}px), calc(1
  * botón se hunde levemente (scale 0.97) para confirmar el clic. Todo es CSS
  * (transform + color), sin JS.
  */
-export default function GoldButton({ href, children, className = '' }: GoldButtonProps) {
+export default function GoldButton({ href, children, className = '', external = false, icon }: GoldButtonProps) {
   return (
     <a
       href={href}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       className={`group relative inline-flex min-h-[48px] items-center overflow-hidden px-7 font-condensed text-[13px] font-medium uppercase tracking-[0.2em] text-gold transition-transform duration-150 ease-out active:scale-[0.97] ${className}`}
       style={{ clipPath: CLIP }}
     >
@@ -29,7 +33,8 @@ export default function GoldButton({ href, children, className = '' }: GoldButto
         aria-hidden="true"
         className="absolute inset-0 origin-left scale-x-0 bg-gold transition-transform duration-[400ms] ease-out group-hover:scale-x-100"
       />
-      <span className="relative z-10 transition-colors duration-200 ease-out group-hover:text-charcoal">
+      <span className="relative z-10 flex items-center gap-2.5 transition-colors duration-200 ease-out group-hover:text-charcoal">
+        {icon}
         {children}
       </span>
     </a>

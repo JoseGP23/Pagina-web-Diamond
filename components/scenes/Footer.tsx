@@ -5,9 +5,10 @@ import { m } from 'framer-motion';
 import { images } from '@/lib/images';
 import { VIEWPORT_REPEAT, CINEMATIC_EASE } from '@/lib/motion';
 import Logo from '@/components/Logo';
+import { WHATSAPP_DISPLAY, whatsappLink } from '@/lib/whatsapp';
 
 const CONTACT_LINKS = [
-  { label: 'WhatsApp', value: '+57 300 000 0000', href: 'https://wa.me/573000000000' },
+  { label: 'WhatsApp', value: WHATSAPP_DISPLAY, href: whatsappLink() },
   { label: 'Instagram', value: '@diamante.meats', href: 'https://instagram.com/diamante.meats' },
 ];
 

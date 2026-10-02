@@ -66,7 +66,7 @@ export default function HistoriaScene() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(90deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.75) 45%, rgba(10,10,10,0.35) 100%), linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0) 30%, rgba(10,10,10,0) 70%, rgba(10,10,10,0.8) 100%)',
+              'linear-gradient(90deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.65) 45%, rgba(10,10,10,0.1) 100%), linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0) 30%, rgba(10,10,10,0) 70%, rgba(10,10,10,0.8) 100%)',
           }}
         />
       </div>

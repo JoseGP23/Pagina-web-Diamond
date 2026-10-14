@@ -56,3 +56,14 @@ export const images: Record<string, SceneImage> = {
     blurDataURL: GENERIC_BLUR,
   },
 };
+
+/** Videos de fondo de las escenas (ver components/SceneVideo.tsx). */
+export const sceneVideos = {
+  fire: {
+    src: '/media/fire-llamas-16x9.mp4',
+    mobileSrc: '/media/fire-llamas-9x16.mp4',
+    poster: '/media/fire-llamas-16x9.webp',
+    mobilePoster: '/media/fire-llamas-9x16.webp',
+    alt: 'Parrilla de brasas que se enciende en llamas',
+  },
+};

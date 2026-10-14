@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, m, useInView, type PanInfo } from 'framer-motion';
 import { CUTS } from '@/lib/cuts';
@@ -11,6 +11,8 @@ import GoldButton from '@/components/GoldButton';
 import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 import IconBadge from '@/components/IconBadge';
 import SmokeParticles from '@/components/SmokeParticles';
+import SceneVideo from '@/components/SceneVideo';
+import { sceneVideos } from '@/lib/images';
 
 const AUTOPLAY_MS = 5000;
 const NOTCH = 20;
@@ -47,17 +49,6 @@ export default function FireSelectionScene() {
     setSlide(([i]) => (target === i ? [i, 1] : [target, target > i ? 1 : -1]));
   }, []);
 
-  // El video del corte activo solo corre mientras la escena está en pantalla.
-  // Se busca en el DOM (no con un ref) porque durante el crossfade conviven
-  // dos diapositivas y la que sale se desmonta después.
-  useEffect(() => {
-    const videos = sectionRef.current?.querySelectorAll('video');
-    videos?.forEach((video) => {
-      if (sectionInView) video.play().catch(() => {});
-      else video.pause();
-    });
-  }, [sectionInView, index]);
-
   function handleDragEnd(_e: unknown, info: PanInfo) {
     // Un gesto rápido basta aunque sea corto: se mira distancia o velocidad.
     const swipe = Math.abs(info.offset.x) > 60 || Math.abs(info.velocity.x) > 400;
@@ -83,11 +74,16 @@ export default function FireSelectionScene() {
       ref={sectionRef}
       className="relative flex min-h-svh w-full flex-col justify-center overflow-hidden bg-charcoal py-20 sm:py-24"
     >
-      {/* Brasa de fondo: degradado radial (sin filter: blur, que es caro) */}
+      {/* Fondo: la parrilla se enciende al llegar a la escena y luego sigue
+          ardiendo (repite desde el segundo 4, cuando ya está en llamas). */}
+      <SceneVideo {...sceneVideos.fire} playback={4} />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
-        style={{ background: 'radial-gradient(60% 70% at 50% 100%, rgba(192,57,43,0.22) 0%, rgba(10,10,10,0) 70%)' }}
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.7) 35%, rgba(10,10,10,0.55) 70%, rgba(10,10,10,0.8) 100%)',
+        }}
       />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 sm:px-10">
@@ -155,7 +151,7 @@ export default function FireSelectionScene() {
           onPointerLeave={() => setHovered(false)}
         >
           <m.div
-            className="relative h-[52svh] w-full touch-pan-y overflow-hidden bg-charcoal-light sm:h-[58svh] lg:h-[62svh]"
+            className="relative h-[68svh] w-full touch-pan-y overflow-hidden bg-black sm:h-[66svh] lg:h-[74svh]"
             style={{ clipPath: PANEL_CLIP }}
             drag={reducedMotion ? false : 'x'}
             dragConstraints={{ left: 0, right: 0 }}
@@ -176,38 +172,28 @@ export default function FireSelectionScene() {
                 // La salida es más rápida que la entrada: el corte nuevo toma el protagonismo enseguida.
                 exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_OUT } }}
               >
-                {cut.video ? (
-                  <video
-                    // Escalado desde la esquina superior izquierda: deja fuera de
-                    // cuadro la marca de agua de la esquina inferior derecha.
-                    className="absolute inset-0 h-full w-full origin-top-left scale-[1.12] object-cover"
-                    src={cut.video}
-                    poster={cut.image}
-                    autoPlay={sectionInView}
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    aria-hidden="true"
-                  />
-                ) : (
+                {/* El corte es el protagonista: ocupa casi todo el panel (en
+                    escritorio, el 68% derecho; en celular, la parte de arriba).
+                    Las fotos vienen sobre negro y el panel también lo es, así que
+                    `object-cover` solo recorta fondo negro y agranda el corte. */}
+                <div className="absolute inset-x-0 top-0 h-[72%] md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[68%]">
                   <Image
                     src={cut.image}
                     alt={`Corte ${cut.name} Diamante`}
                     fill
-                    sizes="(max-width: 1152px) 100vw, 1152px"
-                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    className="scale-[1.08] object-cover object-center"
                     draggable={false}
                   />
-                )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/20 to-transparent" />
+                </div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent md:bg-gradient-to-r md:from-black md:via-black/40 md:via-35% md:to-transparent md:to-55%" />
               </m.div>
             </AnimatePresence>
 
             <SmokeParticles variant="spark" intensity={isMobile ? 'low' : 'high'} active={sectionInView && !reducedMotion} />
 
             {/* Nombre del corte: entra desde el lado hacia el que se avanzó */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-10" aria-live="polite">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-10 md:right-auto md:w-[46%]" aria-live="polite">
               <AnimatePresence mode="popLayout" initial={false} custom={direction}>
                 <m.div
                   key={cut.name}

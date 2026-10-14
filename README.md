@@ -56,7 +56,7 @@ docker build -t diamante-web .
 docker run -d -p 3000:3000 --name diamante-web diamante-web
 ```
 
-- La primera construcción tarda unos minutos y necesita internet, porque descarga dependencias y tipografías. Después, el contenedor funciona sin conexión, salvo el QR de ejemplo del footer (Picsum).
+- La primera construcción tarda unos minutos y necesita internet, porque descarga dependencias y tipografías. Después, el contenedor funciona sin conexión, salvo las imágenes de stock de Unsplash y Picsum.
 - Para usar otro puerto, por ejemplo el 8080: `docker run -p 8080:3000 diamante-web`.
 - Si cambias el código, fotos o videos, vuelve a ejecutar `docker compose up -d --build` para regenerar la imagen.
 - Para desplegar en un servidor (VPS, Render, Railway, Fly.io, etc.), usa el mismo `Dockerfile`: la imagen escucha en el puerto `3000` (se puede cambiar con la variable `PORT`).
@@ -97,24 +97,23 @@ lib/
   images.ts              Mapa centralizado de imágenes (locales y de stock)
   heroFrames.ts          Secuencia de fotogramas del Hero (cantidad y rutas)
   useFrameSequence.ts    Dibuja en un canvas el fotograma que toca según el scroll
-  cuts.ts                Productos por línea: Fire, Daily, Smoke y Black Reserve (nombre, descripción, foto)
+  cuts.ts                Cortes del carrusel "Fire Selection" (nombre, foto, video opcional)
   motion.ts               Curvas y variantes de animación compartidas
   useMediaQuery.ts        Hooks de responsive / prefers-reduced-motion
-originales/             Material original en alta de Diamante (no se sube a git ni al contenedor)
+media/
+  hero.mp4               Video original del Hero (fuente de los fotogramas, no se publica)
 public/
   hero-frames/           Fotogramas del Hero: desktop/ (horizontal) y mobile/ (vertical)
-  images/cortes/         Fotos de producto de cada corte (WebP)
-  images/daily/          Capas de la tabla de Daily (con fondo transparente)
-  images/historia/       Finca de Historia separada en capas por profundidad
-  media/                 Videos de fondo de las escenas y sus pósters
+  images/                Fotografías reales de Diamante
+  videos/                Videos de los cortes de Fire Selection
 ```
 
 ## Cómo funciona el Hero
 
-El Hero se queda fijo mientras bajas y el scroll mueve la "cámara" del video: el tomahawk completo con el titular, acercamiento al marmoleo y cierre con la firma DIAMANTE sobre la veta. No es un `<video>`: son 60 fotogramas WebP que se dibujan en un `<canvas>` según la posición del scroll, mezclando dos fotogramas vecinos para que se vea fluido. Adelantar un video con el scroll se traba en muchos navegadores, sobre todo en iPhone.
+El Hero se queda fijo mientras bajas y el scroll mueve la "cámara" del video: plano abierto con el titular, acercamiento a las llamas y cierre con la firma DIAMANTE. No es un `<video>`: son 61 fotogramas WebP que se dibujan en un `<canvas>` según la posición del scroll, mezclando dos fotogramas vecinos para que se vea fluido. Adelantar un video con el scroll se traba en muchos navegadores, sobre todo en iPhone.
 
 - El primer fotograma está en el HTML, así que se ve de inmediato. Los demás se descargan en orden "de grueso a fino": primero el inicial y el final, luego el del medio, y así. El scroll funciona desde los primeros KB.
-- En celular se usan fotogramas verticales más livianos (`mobile/`, ~4 MB en total; escritorio ~3.8 MB). El scroll funciona desde los primeros fotogramas.
+- En celular se usan fotogramas verticales más livianos (`mobile/`, ~1.9 MB en total; escritorio ~3.1 MB).
 - Con movimiento reducido activado, el Hero es una pantalla fija con el primer fotograma y el titular.
 - Los tramos de cada capítulo están al inicio de [`components/scenes/Hero.tsx`](components/scenes/Hero.tsx) (`CHAPTER_1`, `CHAPTER_2`, `CHAPTER_3_START`). La altura del recorrido está en la clase `h-[320svh] md:h-[400svh]` de la misma sección.
 
@@ -133,16 +132,15 @@ El número y los mensajes están en [`lib/whatsapp.ts`](lib/whatsapp.ts): cambia
 Todo el contenido visual se controla desde estos archivos, no hace falta tocar los componentes:
 
 - **Imágenes generales:** agrega el archivo a `public/images/` y actualiza su `url` en [`lib/images.ts`](lib/images.ts) (ej. `url: '/images/mi-foto.jpg'`).
-- **Video del Hero:** los fotogramas salen de `originales/clips/hero/hero-acercamiento-16x9.mp4` y `-9x16.mp4`. Para cambiarlo, borra el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile` y regenera con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto:
+- **Video del Hero:** reemplaza `media/hero.mp4` y regenera los fotogramas con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto (borra antes el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile`):
 
   ```bash
-  ffmpeg -t 6 -i originales/clips/hero/hero-acercamiento-16x9.mp4 -vf "fps=10,scale=1280:-2:flags=lanczos" -c:v libwebp -quality 52 -compression_level 6 public/hero-frames/desktop/%03d.webp
-  ffmpeg -t 6 -i originales/clips/hero/hero-acercamiento-9x16.mp4 -vf "fps=10,scale=600:-2:flags=lanczos" -c:v libwebp -quality 48 -compression_level 6 public/hero-frames/mobile/%03d.webp
+  ffmpeg -i media/hero.mp4 -vf "fps=12,crop=1764:1040:0:0,eq=contrast=1.08:saturation=1.12:brightness=-0.02,scale=1280:-2:flags=lanczos" -c:v libwebp -quality 62 -compression_level 6 public/hero-frames/desktop/%03d.webp
+  ffmpeg -i media/hero.mp4 -vf "fps=12,crop=600:1040:582:0,eq=contrast=1.08:saturation=1.12:brightness=-0.02" -c:v libwebp -quality 52 -compression_level 6 public/hero-frames/mobile/%03d.webp
   ```
 
-  `-t 6` usa los primeros 6 segundos (los últimos dos del clip casi no se mueven). Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts).
-- **Videos de las escenas** (fuego, Black Reserve, Chef): están en `public/media/` y se configuran en `sceneVideos` de [`lib/images.ts`](lib/images.ts). Se comprimieron con `ffmpeg -i entrada.mp4 -vf "scale=1280:-2" -c:v libx264 -crf 26 -preset slow -pix_fmt yuv420p -movflags +faststart -an salida.mp4` (720 de ancho para las versiones verticales).
-- **Productos de cada línea** (Fire Selection, Daily, Smoke y Black Reserve: nombre, descripción y foto): edita [`lib/cuts.ts`](lib/cuts.ts). Las fotos van en `public/images/cortes/` en WebP.
+  Los valores de `crop` son para un video de 1764×1176: recortan la marca de agua de abajo y, en celular, toman la franja central vertical. Ajústalos si el video nuevo mide distinto. Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts).
+- **Cortes del carrusel "Fire Selection"** (nombre, descripción, foto y video opcional de cada corte): edita [`lib/cuts.ts`](lib/cuts.ts).
 
 Recomendaciones para videos de fondo: formato `.mp4` (H.264), sin audio o silenciado, idealmente menor a 8-10 MB para que cargue rápido.
 

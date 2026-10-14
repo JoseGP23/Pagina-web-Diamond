@@ -2,10 +2,7 @@
 
 import Image from 'next/image';
 import { m } from 'framer-motion';
-import { sceneVideos } from '@/lib/images';
-import { RESERVE_CUTS } from '@/lib/cuts';
-import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
-import SceneVideo from '@/components/SceneVideo';
+import { images } from '@/lib/images';
 import { VIEWPORT_REPEAT, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, ClockIcon, StarIcon, TargetIcon, HeartHandIcon } from '@/components/Icons';
@@ -39,10 +36,17 @@ export default function BlackReserveScene() {
   return (
     <section className="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-charcoal py-24">
       <div className="absolute inset-0">
-        {/* Acercamiento lento al marmoleo del dry-aged: se reproduce una vez al
-            llegar y se queda en el detalle de la veta. */}
-        <SceneVideo {...sceneVideos.blackReserve} playback="once" />
-        <div className="absolute inset-0 bg-charcoal/75" />
+        <Image
+          src={images.blackReserve.url}
+          alt={images.blackReserve.alt}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          placeholder="blur"
+          blurDataURL={images.blackReserve.blurDataURL}
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-charcoal/80" />
       </div>
 
       {/* Spotlight: un degradado radial que se enciende (opacidad + escala).
@@ -97,33 +101,6 @@ export default function BlackReserveScene() {
           Cortes premium de alto marmoleo y procesos especiales para quienes buscan lo
           extraordinario.
         </m.p>
-
-        {/* Los tres madurados: foto + nombre, cada uno abre el pedido */}
-        <m.ul className="mt-12 grid w-full grid-cols-3 gap-3 sm:gap-6" variants={slowReveal}>
-          {RESERVE_CUTS.map((cut) => (
-            <li key={cut.name}>
-              <a
-                href={whatsappLink(orderCutMessage(cut.name))}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block"
-              >
-                <span className="relative block aspect-[4/5] overflow-hidden bg-black">
-                  <Image
-                    src={cut.image}
-                    alt={cut.name}
-                    fill
-                    sizes="(max-width: 640px) 30vw, 260px"
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                  />
-                </span>
-                <span className="mt-3 block font-serif text-lg italic leading-tight text-bone transition-colors duration-200 ease-out group-hover:text-gold sm:text-xl">
-                  {cut.name}
-                </span>
-              </a>
-            </li>
-          ))}
-        </m.ul>
 
         <IconFeatureRow items={FEATURES} className="mt-14 w-full text-left" />
 

@@ -1,28 +1,14 @@
-/**
- * Isotipo de Diamante: la "D" con el corte en faceta arriba a la izquierda
- * (originales/marca/logo-d.svg). Los trazos se exportan para poder
- * dibujarlos con animación (ver la firma del Hero).
- */
-export const LOGO_VIEWBOX = '180 60 315 426';
-export const LOGO_PATHS = [
-  'M195 75 H315 A165 198 0 0 1 315 471 H195 Z',
-  'M210 137 H318 A105 139 0 0 1 318 415 H242 V262 Z',
-];
-
 export default function Logo({ className = 'h-10 w-10' }: { className?: string }) {
   return (
-    <svg
-      viewBox={LOGO_VIEWBOX}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={10}
-      strokeLinejoin="miter"
-      className={className}
-      aria-hidden="true"
-    >
-      {LOGO_PATHS.map((d) => (
-        <path key={d} d={d} />
-      ))}
+    <svg viewBox="0 0 48 48" fill="none" className={className}>
+      <circle cx="24" cy="24" r="22.5" stroke="currentColor" strokeWidth="1" opacity="0.6" />
+      <path
+        d="M16 13h8.5c6.5 0 11 4.7 11 11s-4.5 11-11 11H16V13z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="M16 13v22" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }

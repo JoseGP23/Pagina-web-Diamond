@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import { m, useScroll, useTransform } from 'framer-motion';
-import { historiaLayers } from '@/lib/images';
+import { images } from '@/lib/images';
 import { VIEWPORT_REPEAT, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { DiamondIcon, FamilyIcon, ShieldCheckIcon, FlameIcon } from '@/components/Icons';
@@ -23,26 +24,6 @@ const FEATURES = [
   { icon: <FlameIcon />, label: 'PASIÓN POR EL FUEGO' },
 ];
 
-type LayerName = 'back' | 'mid' | 'front';
-
-/** Una capa de la finca, horizontal en escritorio y vertical en celular. */
-function DepthLayer({ layer }: { layer: LayerName }) {
-  return (
-    <picture>
-      <source media="(max-width: 768px)" srcSet={historiaLayers.mobile[layer]} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={historiaLayers.desktop[layer]}
-        alt={layer === 'back' ? historiaLayers.alt : ''}
-        aria-hidden={layer === 'back' ? undefined : true}
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-    </picture>
-  );
-}
-
 export default function HistoriaScene() {
   const sectionRef = useRef<HTMLElement>(null);
   const reducedMotion = usePrefersReducedMotion();
@@ -53,26 +34,14 @@ export default function HistoriaScene() {
     offset: ['start end', 'end start'],
   });
 
-  // Parallax por profundidad: la foto está separada en tres capas (cielo y
-  // árbol, potrero y cerca, poste cercano) usando su mapa de profundidad.
-  // Cada capa se mueve a una velocidad distinta: lo lejano casi no se
-  // mueve, lo cercano mucho más, y el poste además se acerca (escala).
-  // Rangos fijos: useTransform se queda con los del primer render, así que
-  // celular y escritorio tienen sus propios valores y se elige al aplicar.
-  const backY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
-  const midY = useTransform(scrollYProgress, [0, 1], [-70, 70]);
-  const frontY = useTransform(scrollYProgress, [0, 1], [-130, 130]);
-  const frontScale = useTransform(scrollYProgress, [0, 1], [1.12, 1]);
-  const backYMobile = useTransform(scrollYProgress, [0, 1], [-15, 15]);
-  const midYMobile = useTransform(scrollYProgress, [0, 1], [-35, 35]);
-  const frontYMobile = useTransform(scrollYProgress, [0, 1], [-60, 60]);
-
-  const style = (layer: LayerName) => {
-    if (reducedMotion) return undefined;
-    if (layer === 'back') return { y: isMobile ? backYMobile : backY };
-    if (layer === 'mid') return { y: isMobile ? midYMobile : midY };
-    return { y: isMobile ? frontYMobile : frontY, scale: frontScale };
-  };
+  // Parallax del campo: se mueve más lento que el texto y se "asienta"
+  // (de 1.12 a 1) mientras la escena llega al centro. Los rangos son fijos
+  // (useTransform se queda con los del primer render); celular y movimiento
+  // reducido eligen qué valores aplicar.
+  const yDesktop = useTransform(scrollYProgress, [0, 1], [-70, 70]);
+  const yMobile = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1.12, 1]);
+  const parallax = reducedMotion ? undefined : { y: isMobile ? yMobile : yDesktop, scale };
 
   return (
     <section
@@ -81,23 +50,23 @@ export default function HistoriaScene() {
       className="relative flex min-h-svh w-full items-center overflow-hidden bg-charcoal py-24"
     >
       <div className="absolute inset-0">
-        {(['back', 'mid', 'front'] as const).map((layer) => (
-          <m.div
-            // Se vuelve a montar si cambia el tipo de pantalla o el movimiento
-            // reducido: Framer Motion se queda con los MotionValues del primer render.
-            key={`${layer}-${isMobile}-${reducedMotion}`}
-            className="absolute -inset-y-[12%] inset-x-0 origin-bottom"
-            style={style(layer)}
-          >
-            <DepthLayer layer={layer} />
-          </m.div>
-        ))}
-        {/* Tono cálido muy leve sobre el blanco y negro + contraste para el texto */}
+        <m.div className="absolute -inset-y-[10%] inset-x-0" style={parallax}>
+          <Image
+            src={images.historia.url}
+            alt={images.historia.alt}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            placeholder="blur"
+            blurDataURL={images.historia.blurDataURL}
+            loading="lazy"
+          />
+        </m.div>
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(90deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.6) 42%, rgba(10,10,10,0.05) 100%), linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 28%, rgba(10,10,10,0) 70%, rgba(10,10,10,0.85) 100%), linear-gradient(rgba(201,168,118,0.08), rgba(201,168,118,0.08))',
+              'linear-gradient(90deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.65) 45%, rgba(10,10,10,0.1) 100%), linear-gradient(180deg, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0) 30%, rgba(10,10,10,0) 70%, rgba(10,10,10,0.8) 100%)',
           }}
         />
       </div>

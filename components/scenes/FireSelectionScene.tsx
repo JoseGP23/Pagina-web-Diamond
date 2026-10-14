@@ -151,7 +151,7 @@ export default function FireSelectionScene() {
           onPointerLeave={() => setHovered(false)}
         >
           <m.div
-            className="relative h-[60svh] w-full touch-pan-y overflow-hidden bg-black sm:h-[58svh] lg:h-[62svh]"
+            className="relative h-[68svh] w-full touch-pan-y overflow-hidden bg-black sm:h-[66svh] lg:h-[74svh]"
             style={{ clipPath: PANEL_CLIP }}
             drag={reducedMotion ? false : 'x'}
             dragConstraints={{ left: 0, right: 0 }}
@@ -172,25 +172,28 @@ export default function FireSelectionScene() {
                 // La salida es más rápida que la entrada: el corte nuevo toma el protagonismo enseguida.
                 exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_OUT } }}
               >
-                {/* Las fotos de producto vienen sobre negro: el panel también es
-                    negro, así el corte parece flotar. En escritorio va a la
-                    derecha y el texto a la izquierda; en celular, arriba. */}
-                <Image
-                  src={cut.image}
-                  alt={`Corte ${cut.name} Diamante`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 640px"
-                  className="object-contain object-top md:object-right"
-                  draggable={false}
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent md:bg-gradient-to-r md:from-black md:via-black/50 md:to-transparent" />
+                {/* El corte es el protagonista: ocupa casi todo el panel (en
+                    escritorio, el 68% derecho; en celular, la parte de arriba).
+                    Las fotos vienen sobre negro y el panel también lo es, así que
+                    `object-cover` solo recorta fondo negro y agranda el corte. */}
+                <div className="absolute inset-x-0 top-0 h-[72%] md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[68%]">
+                  <Image
+                    src={cut.image}
+                    alt={`Corte ${cut.name} Diamante`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    className="scale-[1.08] object-cover object-center"
+                    draggable={false}
+                  />
+                </div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent md:bg-gradient-to-r md:from-black md:via-black/40 md:via-35% md:to-transparent md:to-55%" />
               </m.div>
             </AnimatePresence>
 
             <SmokeParticles variant="spark" intensity={isMobile ? 'low' : 'high'} active={sectionInView && !reducedMotion} />
 
             {/* Nombre del corte: entra desde el lado hacia el que se avanzó */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-10" aria-live="polite">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-10 md:right-auto md:w-[46%]" aria-live="polite">
               <AnimatePresence mode="popLayout" initial={false} custom={direction}>
                 <m.div
                   key={cut.name}

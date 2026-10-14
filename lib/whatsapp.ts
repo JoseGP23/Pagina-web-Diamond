@@ -5,10 +5,10 @@
  * Cámbialo aquí, en formato internacional y solo dígitos: código de país
  * (57 para Colombia) seguido del número, sin "+", espacios ni guiones.
  */
-export const WHATSAPP_NUMBER = '573000000000';
+export const WHATSAPP_NUMBER = '573222474145';
 
-/** Número para mostrar en pantalla, ej. "+57 300 000 0000". */
-export const WHATSAPP_DISPLAY = '+57 300 000 0000';
+/** Número para mostrar en pantalla. */
+export const WHATSAPP_DISPLAY = '+57 322 247 4145';
 
 /** Mensaje inicial cuando no se eligió un corte en particular. */
 const DEFAULT_MESSAGE = 'Hola Diamante, quiero hacer un pedido.';

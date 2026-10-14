@@ -6,6 +6,7 @@ import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { useFrameSequence } from '@/lib/useFrameSequence';
 import { frameSrc } from '@/lib/heroFrames';
 import GoldButton from '@/components/GoldButton';
+import { LOGO_PATHS, LOGO_VIEWBOX } from '@/components/Logo';
 import { WhatsAppIcon } from '@/components/Icons';
 import { whatsappLink } from '@/lib/whatsapp';
 
@@ -21,9 +22,9 @@ const WORDMARK = 'DIAMANTE'.split('');
 /**
  * Tramos del scroll dentro del Hero fijado (0 = arriba, 1 = se suelta).
  * La cámara del video recorre tres planos y cada uno tiene su capítulo:
- *   1. Plano abierto (dos cortes)       → titular principal
- *   2. Acercamiento a las llamas        → frase sobre la brasa
- *   3. Plano final (un solo corte)      → firma DIAMANTE
+ *   1. Tomahawk completo sobre la pizarra → titular principal
+ *   2. Acercamiento al marmoleo          → frase sobre la grasa
+ *   3. Macro de la veta                  → firma DIAMANTE
  * Los fotogramas terminan en FRAMES_END; el resto del recorrido deja el
  * plano final quieto mientras se lee la firma.
  */
@@ -144,7 +145,7 @@ export default function Hero() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={frameSrc('desktop', 0)}
-            alt="Dos cortes Diamante sobre la parrilla, entre llamas y humo"
+            alt="Tomahawk crudo de alto marmoleo sobre una pizarra"
             className="absolute inset-0 h-full w-full object-cover"
             fetchPriority="high"
             decoding="async"
@@ -164,7 +165,7 @@ export default function Hero() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(120% 90% at 55% 45%, rgba(10,10,10,0) 40%, rgba(10,10,10,0.7) 100%), linear-gradient(90deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 55%), linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 22%, rgba(10,10,10,0) 55%, rgba(10,10,10,0.85) 100%)',
+              'radial-gradient(120% 90% at 55% 45%, rgba(10,10,10,0) 40%, rgba(10,10,10,0.7) 100%), linear-gradient(90deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 55%), linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 22%, rgba(10,10,10,0) 42%, rgba(10,10,10,0.6) 62%, rgba(10,10,10,0.92) 100%)',
           }}
         />
         {scrub ? (
@@ -245,32 +246,26 @@ export default function Hero() {
                 style={{ background: 'radial-gradient(closest-side, rgba(10,10,10,0.72), rgba(10,10,10,0))' }}
               />
               <p className="font-serif text-[clamp(1.9rem,3.6vw,3.25rem)] italic leading-[1.08] text-bone">
-                El sabor se decide sobre la brasa.
+                El marmoleo es el sabor.
               </p>
               <p className="mx-auto mt-5 max-w-[36ch] font-serif text-lg leading-snug text-bone/75 sm:text-xl">
-                Cada corte se elige por su marmoleo y se termina a fuego directo.
+                Elegimos cada corte por su veta de grasa: es la que se funde en la brasa.
               </p>
             </m.div>
 
             {/* Capítulo 3: la firma */}
             <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
-              <svg viewBox="0 0 48 48" fill="none" className="mb-6 h-14 w-14 text-gold sm:h-16 sm:w-16" aria-hidden="true">
-                <m.circle
-                  cx="24"
-                  cy="24"
-                  r="22.5"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  strokeOpacity="0.6"
-                  style={{ pathLength: logoDraw, opacity: logoDraw }}
-                />
-                <m.path
-                  d="M16 13h8.5c6.5 0 11 4.7 11 11s-4.5 11-11 11H16V13z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinejoin="round"
-                  style={{ pathLength: logoDraw, opacity: logoDraw }}
-                />
+              <svg
+                viewBox={LOGO_VIEWBOX}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={10}
+                className="mb-6 h-16 w-12 text-gold sm:h-20 sm:w-16"
+                aria-hidden="true"
+              >
+                {LOGO_PATHS.map((d) => (
+                  <m.path key={d} d={d} style={{ pathLength: logoDraw, opacity: logoDraw }} />
+                ))}
               </svg>
               <p
                 className="overflow-hidden font-serif text-[clamp(3rem,11vw,10rem)] font-medium leading-none tracking-[0.14em] text-bone">

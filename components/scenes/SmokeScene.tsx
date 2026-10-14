@@ -1,20 +1,39 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { m, useInView } from 'framer-motion';
-import { images } from '@/lib/images';
+import { sceneVideos } from '@/lib/images';
+import { SMOKE_CUTS } from '@/lib/cuts';
 import { VIEWPORT_REPEAT, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
+import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import SmokeParticles from '@/components/SmokeParticles';
 
-const PRODUCTS = ['Smoked Short Rib', 'Hawaiian Style', 'Brisket', 'Beef Pastrami', 'Smoke Selection'];
+const ROTATE_MS = 3500;
 
 export default function SmokeScene() {
   const sectionRef = useRef<HTMLElement>(null);
   const reducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
-  const inView = useInView(sectionRef, { amount: 0.2 });
+  const inView = useInView(sectionRef, { amount: 0.3 });
+  // Producto cuya foto ocupa el fondo (null = el brisket de portada).
+  const [active, setActive] = useState<number | null>(null);
+  const [canHover, setCanHover] = useState(true);
+
+  useEffect(() => {
+    setCanHover(window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  }, []);
+
+  // Sin mouse (celular/tablet) no hay hover: las fotos rotan solas mientras
+  // la escena está en pantalla.
+  useEffect(() => {
+    if (canHover || reducedMotion || !inView) return;
+    const id = setInterval(() => {
+      setActive((i) => (i === null ? 0 : (i + 1) % SMOKE_CUTS.length));
+    }, ROTATE_MS);
+    return () => clearInterval(id);
+  }, [canHover, reducedMotion, inView]);
 
   // Los productos se "condensan" desde el humo: desenfoque fuerte a nítido.
   const productVariants = reducedMotion
@@ -34,17 +53,32 @@ export default function SmokeScene() {
       ref={sectionRef}
       className="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-charcoal py-24"
     >
+      {/* Fondo: portada + una foto por producto, superpuestas. Solo cambia la
+          opacidad (500ms), así el cambio es un fundido barato de pintar. */}
       <div className="absolute inset-0">
-        <Image
-          src={images.smokeSeries.url}
-          alt={images.smokeSeries.alt}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          placeholder="blur"
-          blurDataURL={images.smokeSeries.blurDataURL}
-          loading="lazy"
-        />
+        <picture>
+          <source media="(max-width: 768px)" srcSet={sceneVideos.smoke.mobilePoster} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={sceneVideos.smoke.poster}
+            alt={sceneVideos.smoke.alt}
+            loading="lazy"
+            decoding="async"
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${
+              active === null ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        </picture>
+        {SMOKE_CUTS.map((cut, i) => (
+          <Image
+            key={cut.name}
+            src={cut.image}
+            alt=""
+            fill
+            sizes="100vw"
+            className={`object-cover transition-opacity duration-500 ease-out ${active === i ? 'opacity-100' : 'opacity-0'}`}
+          />
+        ))}
         <div className="absolute inset-0 bg-charcoal/70" />
       </div>
 
@@ -86,20 +120,36 @@ export default function SmokeScene() {
           experiencias únicas alrededor del humo.
         </m.p>
 
-        <ul className="mt-12 flex flex-col items-center gap-x-10 gap-y-3 sm:flex-row sm:flex-wrap sm:justify-center">
-          {PRODUCTS.map((product) => (
-            <m.li
-              key={product}
-              className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] italic leading-tight text-gold"
-              variants={productVariants}
-            >
-              {product}
+        <ul
+          className="mt-12 flex flex-col items-center gap-x-10 gap-y-2 sm:flex-row sm:flex-wrap sm:justify-center"
+          onMouseLeave={() => canHover && setActive(null)}
+        >
+          {SMOKE_CUTS.map((cut, i) => (
+            <m.li key={cut.name} variants={productVariants}>
+              <a
+                href={whatsappLink(orderCutMessage(cut.name))}
+                target="_blank"
+                rel="noopener noreferrer"
+                onMouseEnter={() => setActive(i)}
+                onFocus={() => setActive(i)}
+                aria-label={`Pedir ${cut.name} por WhatsApp`}
+                className={`inline-flex min-h-[48px] items-center font-serif text-[clamp(1.75rem,3vw,2.5rem)] italic leading-tight transition-colors duration-200 ease-out ${
+                  active === i ? 'text-bone' : 'text-gold'
+                }`}
+              >
+                {cut.name}
+              </a>
             </m.li>
           ))}
         </ul>
 
+        {/* Qué es el producto que se está viendo (cambia con el hover o la rotación) */}
+        <p className="mt-4 min-h-[1.75rem] font-serif text-lg italic text-bone/70" aria-live="polite">
+          {active === null ? '' : SMOKE_CUTS[active].description}
+        </p>
+
         <m.p
-          className="mt-14 font-condensed text-[12px] tracking-[0.35em] text-bone/55"
+          className="mt-10 font-condensed text-[12px] tracking-[0.35em] text-bone/55"
           variants={revealVariants(reducedMotion)}
         >
           TIEMPO • HUMO • CARÁCTER

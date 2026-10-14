@@ -1,13 +1,9 @@
 /**
- * Configuración centralizada de imágenes.
+ * Imágenes y videos de fondo de cada escena.
  *
- * Todas las imágenes de la landing viven aquí. Son URLs de placeholder
- * (Unsplash / Picsum) verificadas como activas. Cuando tengas las fotos
- * reales de Diamante, reemplaza únicamente los valores de `url` en este
- * archivo — ningún otro archivo del proyecto necesita cambios.
- *
- * `blurDataURL` es un placeholder base64 genérico (gradiente oscuro) usado
- * mientras carga cada imagen, para que la transición se sienta premium.
+ * Todo sale de `originales/` (material de Diamante) y está optimizado en
+ * `public/images/` y `public/media/`. Las versiones `mobile` son verticales
+ * (9:16) y se usan en pantallas de hasta 768px.
  */
 
 const GENERIC_BLUR =
@@ -20,39 +16,60 @@ export type SceneImage = {
 };
 
 export const images: Record<string, SceneImage> = {
-  heroSteak: {
-    url: 'https://images.unsplash.com/photo-1551028150-64b9f398f678?auto=format&fit=crop&w=1600&q=80',
-    alt: 'Corte premium crudo, protagonista de la selección Diamante',
-    blurDataURL: GENERIC_BLUR,
-  },
-  historia: {
-    url: 'https://images.unsplash.com/photo-1763062690254-be377d55dacf?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Asado en el patio de noche: cortes sobre la parrilla encendida',
-    blurDataURL: GENERIC_BLUR,
-  },
-  dailySelection: {
-    url: '/images/corte-ribeye.jpg',
-    alt: 'Corte Diamante directo en la parrilla, listo para servir',
-    blurDataURL: GENERIC_BLUR,
-  },
-  smokeSeries: {
-    url: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1600&q=80',
-    alt: 'Costillas ahumadas lentamente, textura oscura y humo',
-    blurDataURL: GENERIC_BLUR,
-  },
-  chefProgram: {
-    url: '/images/chef-cortando-carne.jpg',
-    alt: 'Chef profesional cortando un corte Diamante en cocina',
-    blurDataURL: GENERIC_BLUR,
-  },
-  blackReserve: {
-    url: 'https://images.unsplash.com/photo-1432139509613-5c4255815697?auto=format&fit=crop&w=1600&q=80',
-    alt: 'Corte madurado de exclusiva selección, plato de alta gama',
-    blurDataURL: GENERIC_BLUR,
-  },
   qrPlaceholder: {
     url: 'https://picsum.photos/seed/diamante-qr/400/400',
     alt: 'Código QR de contacto Diamante (placeholder)',
     blurDataURL: GENERIC_BLUR,
+  },
+};
+
+/** Finca de Historia separada en capas por profundidad (parallax 3D). */
+export const historiaLayers = {
+  alt: 'Finca familiar en blanco y negro: un árbol solitario sobre las colinas y una cerca de madera',
+  desktop: {
+    back: '/images/historia/finca-16x9.webp',
+    mid: '/images/historia/mid-16x9.webp',
+    front: '/images/historia/fg-16x9.webp',
+  },
+  mobile: {
+    back: '/images/historia/finca-9x16.webp',
+    mid: '/images/historia/mid-9x16.webp',
+    front: '/images/historia/fg-9x16.webp',
+  },
+};
+
+/** Capas de la tabla de Daily Selection (se arma con el scroll). */
+export const dailyLayers = {
+  board: '/images/daily/tabla.webp',
+  meat: '/images/daily/carne.webp',
+  garlic: '/images/daily/ajo.webp',
+  pepper: '/images/daily/pimienta.webp',
+  rosemary: '/images/daily/romero.webp',
+};
+
+export const sceneVideos = {
+  fire: {
+    src: '/media/fire-llamas-16x9.mp4',
+    mobileSrc: '/media/fire-llamas-9x16.mp4',
+    poster: '/media/fire-llamas-16x9.webp',
+    mobilePoster: '/media/fire-llamas-9x16.webp',
+    alt: 'Parrilla de brasas que se enciende en llamas',
+  },
+  blackReserve: {
+    src: '/media/black-marmoleo-16x9.mp4',
+    mobileSrc: '/media/black-marmoleo-9x16.mp4',
+    poster: '/media/black-marmoleo-16x9.webp',
+    mobilePoster: '/media/black-marmoleo-9x16.webp',
+    alt: 'Ribeye madurado en seco con marmoleo intenso',
+  },
+  chef: {
+    src: '/media/chef-emplatado.mp4',
+    poster: '/media/chef-emplatado.webp',
+    alt: 'Chef terminando el emplatado de un corte en tajadas',
+  },
+  smoke: {
+    poster: '/media/smoke-brisket-16x9.webp',
+    mobilePoster: '/media/smoke-brisket-9x16.webp',
+    alt: 'Brisket ahumado sobre papel de carnicero',
   },
 };

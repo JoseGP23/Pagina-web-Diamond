@@ -6,3 +6,7 @@ npm-debug.log*
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Material original en alta (fotos y videos fuente, ~140 MB). El sitio usa las
+# versiones optimizadas de public/. Guárdalo aparte (Drive, OneDrive).
+originales

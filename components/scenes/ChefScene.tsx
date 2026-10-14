@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { m } from 'framer-motion';
-import { images } from '@/lib/images';
+import { sceneVideos } from '@/lib/images';
+import SceneVideo from '@/components/SceneVideo';
 import { VIEWPORT_REPEAT, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, CutIcon, SmokeIcon, HandshakeIcon, ShieldCheckIcon } from '@/components/Icons';
@@ -44,16 +44,7 @@ export default function ChefScene() {
                 }
           }
         >
-          <Image
-            src={images.chefProgram.url}
-            alt={images.chefProgram.alt}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-            placeholder="blur"
-            blurDataURL={images.chefProgram.blurDataURL}
-            loading="lazy"
-          />
+          <SceneVideo {...sceneVideos.chef} playback="loop" />
         </m.div>
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-charcoal/60" />
         <m.span

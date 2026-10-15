@@ -6,15 +6,12 @@ import { m, useScroll, useTransform } from 'framer-motion';
 import { images } from '@/lib/images';
 import { VIEWPORT_ONCE, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
-import IconFeatureRow from '@/components/IconFeatureRow';
-import { ClockIcon, CutIcon, StarIcon, FamilyIcon } from '@/components/Icons';
+import GoldButton from '@/components/GoldButton';
+import { WhatsAppIcon } from '@/components/Icons';
+import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 
-const FEATURES = [
-  { icon: <ClockIcon />, label: 'COCINA DIARIA' },
-  { icon: <CutIcon />, label: 'VERSÁTILES' },
-  { icon: <StarIcon />, label: 'DELICIOSOS' },
-  { icon: <FamilyIcon />, label: 'PARA TODA LA FAMILIA' },
-];
+/** Cortes de la línea Daily: cada uno abre su pedido por WhatsApp. */
+const DAILY_CUTS = ['Chatas', 'Solomito', 'Muchacho', 'Sobrebarriga', 'Molida Premium'];
 
 export default function DailyScene() {
   const ref = useRef<HTMLElement>(null);
@@ -84,7 +81,38 @@ export default function DailyScene() {
           </m.p>
         </m.div>
 
-        <IconFeatureRow items={FEATURES} className="w-full max-w-2xl" />
+        <m.div
+          className="flex w-full max-w-2xl flex-col items-end gap-8"
+          variants={staggerContainer(0.06)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT_ONCE}
+        >
+          <ul className="flex flex-wrap justify-end gap-x-8 gap-y-1 border-t border-bone/15 pt-5">
+            {DAILY_CUTS.map((cut) => (
+              <m.li key={cut} variants={slideIn}>
+                <a
+                  href={whatsappLink(orderCutMessage(cut))}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Pedir ${cut} por WhatsApp`}
+                  className="inline-flex min-h-[44px] items-center font-serif text-2xl italic text-bone transition-colors duration-200 ease-out hover:text-gold sm:text-3xl"
+                >
+                  {cut}
+                </a>
+              </m.li>
+            ))}
+          </ul>
+          <m.div variants={slideIn}>
+            <GoldButton
+              href={whatsappLink('Hola Diamante, quiero hacer un pedido de la línea Daily Selection.')}
+              external
+              icon={<WhatsAppIcon className="h-4 w-4" />}
+            >
+              Pedir Daily Selection
+            </GoldButton>
+          </m.div>
+        </m.div>
       </div>
     </section>
   );

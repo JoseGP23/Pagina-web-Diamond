@@ -50,11 +50,6 @@ export const images: Record<string, SceneImage> = {
     alt: 'Corte madurado de exclusiva selección, plato de alta gama',
     blurDataURL: GENERIC_BLUR,
   },
-  qrPlaceholder: {
-    url: 'https://picsum.photos/seed/diamante-qr/400/400',
-    alt: 'Código QR de contacto Diamante (placeholder)',
-    blurDataURL: GENERIC_BLUR,
-  },
 };
 
 /** Videos de fondo de las escenas (ver components/SceneVideo.tsx). */

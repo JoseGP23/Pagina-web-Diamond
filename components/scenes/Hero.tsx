@@ -180,7 +180,7 @@ export default function Hero() {
         >
           <a href="#inicio" className="flex items-baseline gap-2 text-bone" aria-label="Diamante, inicio">
             <span className="font-serif text-xl font-medium tracking-[0.18em] sm:text-2xl">DIAMANTE</span>
-            <span className="hidden font-condensed text-[10px] tracking-[0.35em] text-gold sm:inline">
+            <span className="hidden font-condensed text-[12px] tracking-[0.35em] text-gold sm:inline">
               SELECTED MEATS
             </span>
           </a>
@@ -207,7 +207,7 @@ export default function Hero() {
           className="absolute inset-x-0 bottom-0 z-10 px-5 pb-12 sm:px-10 sm:pb-16 lg:px-16 lg:pb-20"
           style={scrub ? { ...chapter1, pointerEvents: chapter1PointerEvents } : undefined}
         >
-          <p className="hero-line mb-5 font-condensed text-[12px] tracking-[0.3em] text-gold [animation-delay:80ms]">
+          <p className="hero-line mb-5 font-condensed text-[13px] tracking-[0.3em] text-gold [animation-delay:80ms] [text-shadow:0_1px_12px_rgba(10,10,10,0.9)]">
             TRADICIÓN FAMILIAR DESDE 2020
           </p>
           <h1 className="font-serif text-[clamp(2.75rem,8.4vw,8rem)] font-medium leading-[0.9] tracking-[-0.015em] text-bone">
@@ -292,7 +292,7 @@ export default function Hero() {
 
             {/* Progreso del recorrido + pista de scroll */}
             <div aria-hidden="true" className="absolute right-6 top-1/2 z-10 hidden -translate-y-1/2 flex-col items-center gap-3 md:flex lg:right-10">
-              <m.span className="font-condensed text-[10px] tracking-[0.4em] text-bone/60" style={{ opacity: hint }}>
+              <m.span className="font-condensed text-[12px] tracking-[0.4em] text-bone/70" style={{ opacity: hint }}>
                 DESLIZA
               </m.span>
               <span className="relative block h-24 w-px overflow-hidden bg-bone/15">

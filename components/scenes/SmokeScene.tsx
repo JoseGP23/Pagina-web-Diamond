@@ -11,6 +11,7 @@ import {
   staggerContainer,
 } from "@/lib/motion";
 import { usePrefersReducedMotion, useIsMobile } from "@/lib/useMediaQuery";
+import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 import SmokeParticles from "@/components/SmokeParticles";
 
 const PRODUCTS = [
@@ -111,20 +112,35 @@ export default function SmokeScene() {
           intensidad, textura y experiencias únicas alrededor del humo.
         </m.p>
 
-        <ul className="mt-12 flex flex-col items-center gap-x-10 gap-y-3 sm:flex-row sm:flex-wrap sm:justify-center">
+        {/* Cada producto abre el pedido por WhatsApp con su nombre ya escrito */}
+        <ul className="mt-12 flex flex-col items-center gap-x-10 gap-y-1 sm:flex-row sm:flex-wrap sm:justify-center">
           {PRODUCTS.map((product) => (
-            <m.li
-              key={product}
-              className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] italic leading-tight text-gold"
-              variants={productVariants}
-            >
-              {product}
+            <m.li key={product} variants={productVariants}>
+              <a
+                href={whatsappLink(orderCutMessage(product))}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Pedir ${product} por WhatsApp`}
+                className="group relative inline-flex min-h-[48px] items-center font-serif text-[clamp(1.75rem,3vw,2.5rem)] italic leading-tight text-gold transition-colors duration-200 ease-out hover:text-bone"
+              >
+                {product}
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-bone/70 transition-transform duration-300 ease-out group-hover:scale-x-100"
+                />
+              </a>
             </m.li>
           ))}
         </ul>
+        <m.p
+          className="mt-4 font-condensed text-[12px] tracking-[0.3em] text-bone/70"
+          variants={revealVariants(reducedMotion)}
+        >
+          TOCA UN PRODUCTO PARA PEDIRLO POR WHATSAPP
+        </m.p>
 
         <m.p
-          className="mt-14 font-condensed text-[12px] tracking-[0.35em] text-bone/55"
+          className="mt-10 font-condensed text-[12px] tracking-[0.35em] text-bone/60"
           variants={revealVariants(reducedMotion)}
         >
           TIEMPO • HUMO • CARÁCTER

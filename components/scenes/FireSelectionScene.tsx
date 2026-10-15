@@ -262,7 +262,7 @@ export default function FireSelectionScene() {
                     aria-selected={active}
                     aria-label={`Ver corte ${c.name}`}
                     onClick={() => goToIndex(i)}
-                    className="group/dot flex h-11 w-5 items-center justify-center sm:w-10"
+                    className="group/dot flex h-11 w-6 items-center justify-center sm:w-10"
                   >
                     <span className="relative block h-[2px] overflow-hidden bg-bone/20 transition-colors duration-200 ease-out group-hover/dot:bg-bone/40 w-3.5 sm:w-8">
                       {active ? (
@@ -299,7 +299,7 @@ export default function FireSelectionScene() {
         </div>
 
         <m.p
-          className="mt-12 text-center font-condensed text-[12px] tracking-[0.35em] text-bone/55"
+          className="mt-12 text-center font-condensed text-[12px] tracking-[0.35em] text-bone/60"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={VIEWPORT_ONCE}

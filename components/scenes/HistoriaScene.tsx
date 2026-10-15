@@ -6,8 +6,6 @@ import { m, useScroll, useTransform } from 'framer-motion';
 import { images } from '@/lib/images';
 import { VIEWPORT_ONCE, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
-import { DiamondIcon, FamilyIcon, ShieldCheckIcon, FlameIcon } from '@/components/Icons';
-import IconFeatureRow from '@/components/IconFeatureRow';
 
 const LEAD =
   'DIAMANTE nace de una tradición familiar enfocada en la selección y comercialización de productos cárnicos premium.';
@@ -17,12 +15,6 @@ const PARAGRAPHS = [
   'Combinamos tradición, técnica y una selección cuidadosamente curada para ofrecer productos premium para hogares, restaurantes y experiencias alrededor del fuego.',
 ];
 
-const FEATURES = [
-  { icon: <DiamondIcon />, label: 'SELECCIÓN PREMIUM' },
-  { icon: <FamilyIcon />, label: 'TRADICIÓN FAMILIAR' },
-  { icon: <ShieldCheckIcon />, label: 'CALIDAD Y CONFIANZA' },
-  { icon: <FlameIcon />, label: 'PASIÓN POR EL FUEGO' },
-];
 
 export default function HistoriaScene() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -113,7 +105,6 @@ export default function HistoriaScene() {
           </div>
         </m.div>
 
-        <IconFeatureRow items={FEATURES} className="max-w-4xl" />
       </div>
     </section>
   );

@@ -5,18 +5,14 @@ import { m } from 'framer-motion';
 import { images } from '@/lib/images';
 import { VIEWPORT_ONCE, VIEWPORT_REPEAT, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
-import { DiamondIcon, ClockIcon, StarIcon, TargetIcon, HeartHandIcon } from '@/components/Icons';
-import IconFeatureRow from '@/components/IconFeatureRow';
+import { DiamondIcon } from '@/components/Icons';
+import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 
 // Black Reserve va más lento y suave que el resto: es la escena de mayor exclusividad.
 const SLOW_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const FEATURES = [
-  { icon: <ClockIcon />, label: 'MADURADOS' },
-  { icon: <TargetIcon />, label: 'SELECCIÓN LIMITADA' },
-  { icon: <StarIcon />, label: 'MÁXIMA CALIDAD' },
-  { icon: <HeartHandIcon />, label: 'EXPERIENCIA ÚNICA' },
-];
+/** Cortes madurados en seco: disponibilidad limitada, se piden por WhatsApp. */
+const RESERVE_CUTS = ['Ribeye Dry Aged', 'New York Dry Aged', 'Tomahawk Dry Aged'];
 
 export default function BlackReserveScene() {
   const reducedMotion = usePrefersReducedMotion();
@@ -104,9 +100,29 @@ export default function BlackReserveScene() {
           extraordinario.
         </m.p>
 
-        <IconFeatureRow items={FEATURES} className="mt-14 w-full text-left" />
+        <m.ul
+          className="mt-12 flex w-full flex-col items-center border-y border-bone/15 sm:flex-row sm:justify-center sm:divide-x sm:divide-bone/15"
+          variants={slowReveal}
+        >
+          {RESERVE_CUTS.map((cut) => (
+            <li key={cut} className="w-full sm:w-auto">
+              <a
+                href={whatsappLink(orderCutMessage(cut))}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Pedir ${cut} por WhatsApp`}
+                className="group flex min-h-[64px] flex-col items-center justify-center px-8 py-4"
+              >
+                <span className="font-serif text-2xl italic text-bone transition-colors duration-200 ease-out group-hover:text-gold">
+                  {cut}
+                </span>
+                <span className="mt-1 font-condensed text-[12px] tracking-[0.3em] text-gold/90">PEDIR</span>
+              </a>
+            </li>
+          ))}
+        </m.ul>
 
-        <m.p className="mt-12 font-condensed text-[12px] tracking-[0.35em] text-bone/55" variants={slowReveal}>
+        <m.p className="mt-12 font-condensed text-[12px] tracking-[0.35em] text-bone/60" variants={slowReveal}>
           EXCLUSIVIDAD • CALIDAD • PRESTIGIO
         </m.p>
       </m.div>

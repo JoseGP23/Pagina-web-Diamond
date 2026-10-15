@@ -8,7 +8,7 @@
  * cambia la cantidad de fotogramas.
  */
 
-export const FRAME_COUNT = 61;
+export const FRAME_COUNT = 80;
 
 export type FrameSet = 'desktop' | 'mobile';
 

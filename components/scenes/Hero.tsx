@@ -25,9 +25,11 @@ const WORDMARK = 'DIAMANTE'.split('');
  *   2. Acercamiento a las llamas        → frase sobre la brasa
  *   3. Plano final (un solo corte)      → firma DIAMANTE
  * Los fotogramas terminan en FRAMES_END; el resto del recorrido deja el
- * plano final quieto mientras se lee la firma.
+ * plano final quieto un momento mientras se lee la firma.
  */
-const FRAMES_END = 0.86;
+// El video tiene un cambio de plano a los 6.9 s (de 10 s): con 0.95 cae
+// justo cuando el plano se oscurece para la firma, y queda disimulado.
+const FRAMES_END = 0.95;
 const CHAPTER_1: [number, number] = [0.14, 0.26];
 const CHAPTER_2 = [0.32, 0.4, 0.54, 0.62];
 const CHAPTER_3_START = 0.68;

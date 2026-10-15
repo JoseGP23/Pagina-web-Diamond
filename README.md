@@ -110,10 +110,10 @@ public/
 
 ## Cómo funciona el Hero
 
-El Hero se queda fijo mientras bajas y el scroll mueve la "cámara" del video: plano abierto con el titular, acercamiento a las llamas y cierre con la firma DIAMANTE. No es un `<video>`: son 61 fotogramas WebP que se dibujan en un `<canvas>` según la posición del scroll, mezclando dos fotogramas vecinos para que se vea fluido. Adelantar un video con el scroll se traba en muchos navegadores, sobre todo en iPhone.
+El Hero se queda fijo mientras bajas y el scroll mueve la "cámara" del video: plano abierto con el titular, acercamiento a las llamas y cierre con la firma DIAMANTE. No es un `<video>`: son 80 fotogramas WebP que se dibujan en un `<canvas>` según la posición del scroll, mezclando dos fotogramas vecinos para que se vea fluido. Adelantar un video con el scroll se traba en muchos navegadores, sobre todo en iPhone.
 
 - El primer fotograma está en el HTML, así que se ve de inmediato. Los demás se descargan en orden "de grueso a fino": primero el inicial y el final, luego el del medio, y así. El scroll funciona desde los primeros KB.
-- En celular se usan fotogramas verticales más livianos (`mobile/`, ~1.9 MB en total; escritorio ~3.1 MB).
+- En celular se usan fotogramas verticales más livianos (`mobile/`, ~2.3 MB en total; escritorio ~4.7 MB).
 - Con movimiento reducido activado, el Hero es una pantalla fija con el primer fotograma y el titular.
 - Los tramos de cada capítulo están al inicio de [`components/scenes/Hero.tsx`](components/scenes/Hero.tsx) (`CHAPTER_1`, `CHAPTER_2`, `CHAPTER_3_START`). La altura del recorrido está en la clase `h-[320svh] md:h-[400svh]` de la misma sección.
 
@@ -132,14 +132,14 @@ El número y los mensajes están en [`lib/whatsapp.ts`](lib/whatsapp.ts): cambia
 Todo el contenido visual se controla desde estos archivos, no hace falta tocar los componentes:
 
 - **Imágenes generales:** agrega el archivo a `public/images/` y actualiza su `url` en [`lib/images.ts`](lib/images.ts) (ej. `url: '/images/mi-foto.jpg'`).
-- **Video del Hero:** reemplaza `media/hero.mp4` y regenera los fotogramas con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto (borra antes el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile`):
+- **Video del Hero:** reemplaza `media/hero.mp4` (1920×1080) y regenera los fotogramas con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto (borra antes el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile`):
 
   ```bash
-  ffmpeg -i media/hero.mp4 -vf "fps=12,crop=1764:1040:0:0,eq=contrast=1.08:saturation=1.12:brightness=-0.02,scale=1280:-2:flags=lanczos" -c:v libwebp -quality 62 -compression_level 6 public/hero-frames/desktop/%03d.webp
-  ffmpeg -i media/hero.mp4 -vf "fps=12,crop=600:1040:582:0,eq=contrast=1.08:saturation=1.12:brightness=-0.02" -c:v libwebp -quality 52 -compression_level 6 public/hero-frames/mobile/%03d.webp
+  ffmpeg -i media/hero.mp4 -vf "fps=8,scale=1600:-2:flags=lanczos" -c:v libwebp -quality 58 -compression_level 6 -preset photo public/hero-frames/desktop/%03d.webp
+  ffmpeg -i media/hero.mp4 -vf "fps=8,crop=608:1080:656:0" -c:v libwebp -quality 55 -compression_level 6 -preset photo public/hero-frames/mobile/%03d.webp
   ```
 
-  Los valores de `crop` son para un video de 1764×1176: recortan la marca de agua de abajo y, en celular, toman la franja central vertical. Ajústalos si el video nuevo mide distinto. Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts).
+  La versión de celular toma la franja central vertical del video, sin ampliarla. Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts). Si el video nuevo tiene un cambio de plano, ajusta `FRAMES_END` en el Hero para que caiga en la transición a la firma.
 - **Cortes del carrusel "Fire Selection"** (nombre, descripción, foto y video opcional de cada corte): edita [`lib/cuts.ts`](lib/cuts.ts).
 
 Recomendaciones para videos de fondo: formato `.mp4` (H.264), sin audio o silenciado, idealmente menor a 8-10 MB para que cargue rápido.

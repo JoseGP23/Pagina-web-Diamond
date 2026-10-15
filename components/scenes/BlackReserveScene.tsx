@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, staggerContainer } from '@/lib/motion';
+import { VIEWPORT_ONCE, VIEWPORT_REPEAT, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, ClockIcon, StarIcon, TargetIcon, HeartHandIcon } from '@/components/Icons';
 import IconFeatureRow from '@/components/IconFeatureRow';
@@ -24,11 +24,10 @@ export default function BlackReserveScene() {
   const slowReveal = reducedMotion
     ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.6 } } }
     : {
-        hidden: { opacity: 0, transform: 'translateY(20px)', filter: 'blur(6px)' },
+        hidden: { opacity: 0, transform: 'translateY(20px)' },
         visible: {
           opacity: 1,
           transform: 'translateY(0px)',
-          filter: 'blur(0px)',
           transition: { duration: 1.3, ease: SLOW_EASE },
         },
       };
@@ -57,6 +56,9 @@ export default function BlackReserveScene() {
         <m.div
           className="h-[110vmin] w-[110vmin] shrink-0"
           style={{ background: 'radial-gradient(circle, rgba(201,168,118,0.28) 0%, rgba(201,168,118,0.08) 35%, rgba(201,168,118,0) 65%)' }}
+          // key: Framer Motion se queda con el `initial` del primer render;
+          // al activarse el movimiento reducido se vuelve a montar sin escala.
+          key={`spotlight-${reducedMotion}`}
           initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.6 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={VIEWPORT_REPEAT}
@@ -69,7 +71,7 @@ export default function BlackReserveScene() {
         variants={staggerContainer(0.12)}
         initial="hidden"
         whileInView="visible"
-        viewport={VIEWPORT_REPEAT}
+        viewport={VIEWPORT_ONCE}
       >
         <m.span className="relative mb-8 block overflow-hidden text-gold" variants={slowReveal}>
           <DiamondIcon className="h-14 w-14" />

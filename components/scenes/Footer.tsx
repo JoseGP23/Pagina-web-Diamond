@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE } from '@/lib/motion';
+import { VIEWPORT_ONCE, CINEMATIC_EASE } from '@/lib/motion';
 import Logo from '@/components/Logo';
 import { WHATSAPP_DISPLAY, whatsappLink } from '@/lib/whatsapp';
 
@@ -19,7 +19,7 @@ export default function Footer() {
         className="mx-auto grid w-full max-w-6xl gap-14 lg:grid-cols-[1.4fr_1fr] lg:items-end"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={VIEWPORT_REPEAT}
+        viewport={VIEWPORT_ONCE}
         transition={{ duration: 0.9, ease: CINEMATIC_EASE }}
       >
         <div>

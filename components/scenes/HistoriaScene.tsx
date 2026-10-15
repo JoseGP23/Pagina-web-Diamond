@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { m, useScroll, useTransform } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
+import { VIEWPORT_ONCE, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { DiamondIcon, FamilyIcon, ShieldCheckIcon, FlameIcon } from '@/components/Icons';
 import IconFeatureRow from '@/components/IconFeatureRow';
@@ -41,6 +41,8 @@ export default function HistoriaScene() {
   const yDesktop = useTransform(scrollYProgress, [0, 1], [-70, 70]);
   const yMobile = useTransform(scrollYProgress, [0, 1], [-30, 30]);
   const scale = useTransform(scrollYProgress, [0, 0.5], [1.12, 1]);
+  // El elemento se vuelve a montar (key) cuando cambian estos valores:
+  // Framer Motion se queda con los MotionValues del primer render.
   const parallax = reducedMotion ? undefined : { y: isMobile ? yMobile : yDesktop, scale };
 
   return (
@@ -50,7 +52,7 @@ export default function HistoriaScene() {
       className="relative flex min-h-svh w-full items-center overflow-hidden bg-charcoal py-24"
     >
       <div className="absolute inset-0">
-        <m.div className="absolute -inset-y-[10%] inset-x-0" style={parallax}>
+        <m.div className="absolute -inset-y-[10%] inset-x-0" key={`parallax-${isMobile}-${reducedMotion}`} style={parallax}>
           <Image
             src={images.historia.url}
             alt={images.historia.alt}
@@ -77,7 +79,7 @@ export default function HistoriaScene() {
           variants={staggerContainer(0.08)}
           initial="hidden"
           whileInView="visible"
-          viewport={VIEWPORT_REPEAT}
+          viewport={VIEWPORT_ONCE}
         >
           <m.div className="mb-8 flex items-center gap-4" variants={revealVariants(reducedMotion)}>
             <m.span

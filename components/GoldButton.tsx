@@ -31,7 +31,7 @@ export default function GoldButton({ href, children, className = '', external = 
       <span aria-hidden="true" className="absolute inset-px bg-charcoal/40 backdrop-blur-sm" style={{ clipPath: CLIP }} />
       <span
         aria-hidden="true"
-        className="absolute inset-0 origin-left scale-x-0 bg-gold transition-transform duration-[400ms] ease-out group-hover:scale-x-100"
+        className="absolute inset-0 origin-left scale-x-0 bg-gold transition-transform duration-300 ease-out group-hover:scale-x-100"
       />
       <span className="relative z-10 flex items-center gap-2.5 transition-colors duration-200 ease-out group-hover:text-charcoal">
         {icon}

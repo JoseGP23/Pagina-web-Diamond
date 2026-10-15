@@ -10,15 +10,22 @@ export const EASE_OUT: Bezier = [0.23, 1, 0.32, 1];
 export const EASE_IN_OUT: Bezier = [0.77, 0, 0.175, 1];
 
 /**
- * `once:false` para que cada escena reproduzca su animación de entrada
- * tanto al bajar como al subir (se revierte a "hidden" al salir del
- * viewport y vuelve a animar al re-entrar).
+ * Entradas de contenido (textos, listas, fotos): se animan una sola vez.
+ * Si se repitieran en cada pasada, al volver hacia arriba el contenido
+ * desaparecería y habría que esperar a que se anime de nuevo.
+ */
+export const VIEWPORT_ONCE = { once: true, amount: 0.3 } as const;
+
+/**
+ * Solo para efectos decorativos que no esconden contenido (ej. el
+ * spotlight de Black Reserve): se vuelven a encender en cada pasada.
  */
 export const VIEWPORT_REPEAT = { once: false, amount: 0.3 } as const;
 
 /**
- * Entrada estándar de texto: desplazamiento corto (14px) con un desenfoque
- * leve que se enfoca al llegar. Con movimiento reducido queda solo el fade.
+ * Entrada estándar de texto: desplazamiento corto (14px) + opacidad. Sin
+ * desenfoque: animar `filter` en párrafos grandes obliga a repintarlos en
+ * cada cuadro. Con movimiento reducido queda solo el fade.
  * Se anima `transform` como string (no `y`) para que el navegador pueda
  * hacerlo en el compositor aunque el hilo principal esté ocupado.
  */
@@ -30,11 +37,10 @@ export function revealVariants(reducedMotion: boolean, delay = 0): Variants {
     };
   }
   return {
-    hidden: { opacity: 0, transform: 'translateY(14px)', filter: 'blur(4px)' },
+    hidden: { opacity: 0, transform: 'translateY(14px)' },
     visible: {
       opacity: 1,
       transform: 'translateY(0px)',
-      filter: 'blur(0px)',
       transition: { duration: 0.8, delay, ease: CINEMATIC_EASE },
     },
   };

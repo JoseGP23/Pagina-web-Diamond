@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { m, useScroll, useTransform } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
+import { VIEWPORT_ONCE, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import IconFeatureRow from '@/components/IconFeatureRow';
 import { ClockIcon, CutIcon, StarIcon, FamilyIcon } from '@/components/Icons';
@@ -25,6 +25,8 @@ export default function DailyScene() {
   // Rangos fijos (useTransform se queda con los del primer render).
   const yDesktop = useTransform(scrollYProgress, [0, 1], [-55, 55]);
   const yMobile = useTransform(scrollYProgress, [0, 1], [-25, 25]);
+  // El elemento se vuelve a montar (key) cuando cambian estos valores:
+  // Framer Motion se queda con los MotionValues del primer render.
   const parallax = reducedMotion ? undefined : { y: isMobile ? yMobile : yDesktop };
 
   // Esta escena entra de lado (desde la derecha) para diferenciarse de las verticales.
@@ -38,7 +40,7 @@ export default function DailyScene() {
   return (
     <section ref={ref} className="relative flex min-h-svh w-full items-center overflow-hidden bg-charcoal py-24">
       <div className="absolute inset-0">
-        <m.div style={parallax} className="absolute -inset-y-[10%] inset-x-0">
+        <m.div key={`parallax-${isMobile}-${reducedMotion}`} style={parallax} className="absolute -inset-y-[10%] inset-x-0">
           <Image
             src={images.dailySelection.url}
             alt={images.dailySelection.alt}
@@ -65,7 +67,7 @@ export default function DailyScene() {
           variants={staggerContainer(0.08)}
           initial="hidden"
           whileInView="visible"
-          viewport={VIEWPORT_REPEAT}
+          viewport={VIEWPORT_ONCE}
         >
           <m.h2 className="mb-6 font-condensed text-[12px] tracking-[0.35em] text-gold" variants={slideIn}>
             DAILY SELECTION

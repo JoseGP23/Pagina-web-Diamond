@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { images } from '@/lib/images';
-import { VIEWPORT_REPEAT, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
+import { VIEWPORT_ONCE, CINEMATIC_EASE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, CutIcon, SmokeIcon, HandshakeIcon, ShieldCheckIcon } from '@/components/Icons';
 import IconFeatureRow from '@/components/IconFeatureRow';
@@ -31,7 +31,7 @@ export default function ChefScene() {
         className="relative h-[50svh] w-full overflow-hidden md:h-auto"
         initial="hidden"
         whileInView="visible"
-        viewport={VIEWPORT_REPEAT}
+        viewport={VIEWPORT_ONCE}
       >
         <m.div
           className="absolute inset-0"
@@ -78,7 +78,7 @@ export default function ChefScene() {
         variants={staggerContainer(0.08, 0.15)}
         initial="hidden"
         whileInView="visible"
-        viewport={VIEWPORT_REPEAT}
+        viewport={VIEWPORT_ONCE}
       >
         <div>
           <m.h2 className="mb-6 font-condensed text-[12px] tracking-[0.35em] text-gold" variants={revealVariants(reducedMotion)}>

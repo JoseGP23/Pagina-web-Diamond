@@ -1,7 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
-import { VIEWPORT_REPEAT, revealVariants, staggerContainer } from '@/lib/motion';
+import { VIEWPORT_ONCE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 
 export type FeatureItem = {
@@ -41,7 +41,7 @@ export default function IconFeatureRow({
       variants={staggerContainer(0.06, 0.1)}
       initial="hidden"
       whileInView="visible"
-      viewport={VIEWPORT_REPEAT}
+      viewport={VIEWPORT_ONCE}
     >
       {items.map((item) => (
         <m.li key={item.label} className="flex items-center gap-3" variants={itemVariants}>

@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, m, useInView, type PanInfo } from 'framer-motion';
 import { CUTS } from '@/lib/cuts';
-import { CINEMATIC_EASE, EASE_OUT, VIEWPORT_REPEAT, revealVariants, staggerContainer } from '@/lib/motion';
+import { CINEMATIC_EASE, EASE_OUT, VIEWPORT_ONCE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { FlameIcon, WhatsAppIcon } from '@/components/Icons';
 import GoldButton from '@/components/GoldButton';
@@ -38,16 +38,24 @@ export default function FireSelectionScene() {
   const sectionInView = useInView(sectionRef, { amount: 0.25 });
   const [hovered, setHovered] = useState(false);
 
-  const [[index, direction], setSlide] = useState<[number, number]>([0, 1]);
+  // [índice, dirección, ¿lo cambió el avance automático?]
+  const [[index, direction, auto], setSlide] = useState<[number, number, boolean]>([0, 1, true]);
   const cut = CUTS[index];
 
-  const paginate = useCallback((dir: number) => {
-    setSlide(([i]) => [(i + dir + CUTS.length) % CUTS.length, dir]);
+  const paginate = useCallback((dir: number, fromAutoplay = false) => {
+    setSlide(([i]) => [(i + dir + CUTS.length) % CUTS.length, dir, fromAutoplay]);
   }, []);
 
   const goToIndex = useCallback((target: number) => {
-    setSlide(([i]) => (target === i ? [i, 1] : [target, target > i ? 1 : -1]));
+    setSlide(([i]) => (target === i ? [i, 1, false] : [target, target > i ? 1 : -1, false]));
   }, []);
+
+  // Cuando la persona cambia el corte (flechas, puntos, teclado, arrastre)
+  // la transición es corta para que responda enseguida; el avance
+  // automático puede ser más lento y cinematográfico.
+  const mediaDuration = auto ? 0.9 : 0.5;
+  const textDuration = auto ? 0.7 : 0.35;
+  const textDelay = auto ? 0.12 : 0;
 
   function handleDragEnd(_e: unknown, info: PanInfo) {
     // Un gesto rápido basta aunque sea corto: se mira distancia o velocidad.
@@ -93,7 +101,7 @@ export default function FireSelectionScene() {
           variants={staggerContainer(0.08)}
           initial="hidden"
           whileInView="visible"
-          viewport={VIEWPORT_REPEAT}
+          viewport={VIEWPORT_ONCE}
         >
           <div className="flex items-center gap-5">
             <m.div
@@ -162,12 +170,13 @@ export default function FireSelectionScene() {
               <m.div
                 key={cut.name}
                 className="absolute inset-0"
-                initial={reducedMotion ? { opacity: 0 } : { opacity: 0, transform: 'scale(1.06)', filter: 'blur(8px)' }}
+                // Sin filter: blur. Animarlo sobre una foto de todo el panel la repinta
+                // en cada cuadro; escala + opacidad corren en el compositor.
+                initial={reducedMotion ? { opacity: 0 } : { opacity: 0, transform: 'scale(1.04)' }}
                 animate={{
                   opacity: 1,
                   transform: 'scale(1)',
-                  filter: 'blur(0px)',
-                  transition: { duration: 0.9, ease: CINEMATIC_EASE },
+                  transition: { duration: mediaDuration, ease: CINEMATIC_EASE },
                 }}
                 // La salida es más rápida que la entrada: el corte nuevo toma el protagonismo enseguida.
                 exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_OUT } }}
@@ -204,7 +213,7 @@ export default function FireSelectionScene() {
                     center: {
                       opacity: 1,
                       transform: 'translateX(0px)',
-                      transition: { duration: 0.7, delay: 0.12, ease: CINEMATIC_EASE },
+                      transition: { duration: textDuration, delay: textDelay, ease: CINEMATIC_EASE },
                     },
                     exit: (dir: number) =>
                       reducedMotion
@@ -264,7 +273,7 @@ export default function FireSelectionScene() {
                             animationDuration: `${AUTOPLAY_MS}ms`,
                             animationPlayState: autoplayRunning ? 'running' : 'paused',
                           }}
-                          onAnimationEnd={() => paginate(1)}
+                          onAnimationEnd={() => paginate(1, true)}
                         />
                       ) : null}
                     </span>
@@ -280,7 +289,7 @@ export default function FireSelectionScene() {
                   type="button"
                   aria-label={dir === 'left' ? 'Corte anterior' : 'Siguiente corte'}
                   onClick={() => paginate(dir === 'left' ? -1 : 1)}
-                  className="flex h-11 w-11 items-center justify-center border border-gold/30 text-gold transition-[transform,border-color,background-color] duration-150 ease-out hover:border-gold hover:bg-gold/10 active:scale-[0.95]"
+                  className="flex h-11 w-11 items-center justify-center border border-gold/30 text-gold transition-[transform,border-color,background-color] duration-150 ease-out hover:border-gold hover:bg-gold/10 active:scale-[0.97]"
                 >
                   <Chevron direction={dir} />
                 </button>
@@ -293,7 +302,7 @@ export default function FireSelectionScene() {
           className="mt-12 text-center font-condensed text-[12px] tracking-[0.35em] text-bone/55"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={VIEWPORT_REPEAT}
+          viewport={VIEWPORT_ONCE}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           FUEGO • SABOR • EXPERIENCIA

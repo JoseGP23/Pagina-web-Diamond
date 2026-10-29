@@ -20,6 +20,8 @@ const config: Config = {
         gold: '#c9a876',
         fire: '#c0392b',
         bone: '#f5f0e8',
+        // Errores de formulario (contraste 6:1 sobre el fondo carbón).
+        alert: '#e57a6e',
       },
       fontFamily: {
         serif: ['var(--font-serif)', 'Georgia', 'serif'],

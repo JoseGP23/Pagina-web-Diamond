@@ -3,17 +3,18 @@
 import { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, m, useInView, type PanInfo } from 'framer-motion';
-import { CUTS } from '@/lib/cuts';
+import { productsByLine } from '@/lib/catalog';
 import { CINEMATIC_EASE, EASE_OUT, VIEWPORT_ONCE, revealVariants, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
-import { FlameIcon, WhatsAppIcon } from '@/components/Icons';
+import { FlameIcon } from '@/components/Icons';
 import GoldButton from '@/components/GoldButton';
-import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
+import { useOrderActions } from '@/components/order/OrderProvider';
 import IconBadge from '@/components/IconBadge';
 import SmokeParticles from '@/components/SmokeParticles';
 import SceneVideo from '@/components/SceneVideo';
 import { sceneVideos } from '@/lib/images';
 
+const CUTS = productsByLine('fire');
 const AUTOPLAY_MS = 5000;
 const NOTCH = 20;
 const PANEL_CLIP = `polygon(${NOTCH}px 0, 100% 0, 100% calc(100% - ${NOTCH}px), calc(100% - ${NOTCH}px) 100%, 0 100%, 0 ${NOTCH}px)`;
@@ -37,6 +38,7 @@ export default function FireSelectionScene() {
   const isMobile = useIsMobile();
   const sectionInView = useInView(sectionRef, { amount: 0.25 });
   const [hovered, setHovered] = useState(false);
+  const { openProduct } = useOrderActions();
 
   // [índice, dirección, ¿lo cambió el avance automático?]
   const [[index, direction, auto], setSlide] = useState<[number, number, boolean]>([0, 1, true]);
@@ -168,7 +170,7 @@ export default function FireSelectionScene() {
           >
             <AnimatePresence initial={false} custom={direction}>
               <m.div
-                key={cut.name}
+                key={cut.id}
                 className="absolute inset-0"
                 // Sin filter: blur. Animarlo sobre una foto de todo el panel la repinta
                 // en cada cuadro; escala + opacidad corren en el compositor.
@@ -205,7 +207,7 @@ export default function FireSelectionScene() {
             <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 sm:p-10 md:right-auto md:w-[46%]" aria-live="polite">
               <AnimatePresence mode="popLayout" initial={false} custom={direction}>
                 <m.div
-                  key={cut.name}
+                  key={cut.id}
                   custom={direction}
                   variants={{
                     enter: (dir: number) =>
@@ -231,13 +233,7 @@ export default function FireSelectionScene() {
                   {/* El texto de la diapositiva no recibe clics (para no estorbar el
                       arrastre); solo el botón de pedido los vuelve a activar. */}
                   <div className="pointer-events-auto mt-6">
-                    <GoldButton
-                      href={whatsappLink(orderCutMessage(cut.name))}
-                      external
-                      icon={<WhatsAppIcon className="h-4 w-4" />}
-                    >
-                      Pedir {cut.name}
-                    </GoldButton>
+                    <GoldButton onClick={() => openProduct(cut.id)}>Pedir {cut.name}</GoldButton>
                   </div>
                 </m.div>
               </AnimatePresence>
@@ -246,25 +242,25 @@ export default function FireSelectionScene() {
 
           {/* Controles. En celular las flechas van a la izquierda: a la derecha
               queda el botón flotante de WhatsApp y las taparía. */}
-          <div className="mt-5 flex items-center justify-between gap-4">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
             <p className="order-last whitespace-nowrap font-condensed sm:order-none text-[13px] tracking-[0.3em] text-bone/60">
               <span className="text-gold">{pad(index + 1)}</span> / {pad(CUTS.length)}
             </p>
 
-            <div className="flex items-center" role="tablist" aria-label="Elegir corte">
+            <div className="order-last flex w-full items-center sm:order-none sm:w-auto" role="tablist" aria-label="Elegir corte">
               {CUTS.map((c, i) => {
                 const active = i === index;
                 return (
                   <button
-                    key={c.name}
+                    key={c.id}
                     type="button"
                     role="tab"
                     aria-selected={active}
                     aria-label={`Ver corte ${c.name}`}
                     onClick={() => goToIndex(i)}
-                    className="group/dot flex h-11 w-6 items-center justify-center sm:w-10"
+                    className="group/dot flex h-9 flex-1 items-center justify-center sm:h-11 sm:w-6 sm:flex-none lg:w-9"
                   >
-                    <span className="relative block h-[2px] overflow-hidden bg-bone/20 transition-colors duration-200 ease-out group-hover/dot:bg-bone/40 w-3.5 sm:w-8">
+                    <span className="relative block h-[2px] overflow-hidden bg-bone/20 transition-colors duration-200 ease-out group-hover/dot:bg-bone/40 w-full max-w-[22px] sm:w-4 lg:w-7">
                       {active ? (
                         <span
                           key={index}

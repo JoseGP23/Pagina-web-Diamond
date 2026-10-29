@@ -6,30 +6,28 @@ import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import { useFrameSequence } from '@/lib/useFrameSequence';
 import { frameSrc } from '@/lib/heroFrames';
 import GoldButton from '@/components/GoldButton';
-import { WhatsAppIcon } from '@/components/Icons';
-import { whatsappLink } from '@/lib/whatsapp';
 
 const NAV_LINKS = [
   { label: 'Historia', href: '#historia' },
   { label: 'Fire Selection', href: '#fire-selection' },
   { label: 'Chef Program', href: '#chef-program' },
-  { label: 'Contacto', href: '#contacto' },
+  { label: 'Hacer pedido', href: '#pedido' },
 ];
 
 const WORDMARK = 'DIAMANTE'.split('');
 
 /**
  * Tramos del scroll dentro del Hero fijado (0 = arriba, 1 = se suelta).
- * La cámara del video recorre tres planos y cada uno tiene su capítulo:
- *   1. Plano abierto (dos cortes)       → titular principal
- *   2. Acercamiento a las llamas        → frase sobre la brasa
- *   3. Plano final (un solo corte)      → firma DIAMANTE
- * Los fotogramas terminan en FRAMES_END; el resto del recorrido deja el
- * plano final quieto un momento mientras se lee la firma.
+ * El video es una sola toma de los cortes entre llamas; el scroll la recorre
+ * entera y, para que se sienta como un movimiento de cámara, la imagen se
+ * acerca poco a poco (PUSH_IN). Sobre ella van tres capítulos:
+ *   1. Titular principal
+ *   2. Frase sobre la brasa
+ *   3. Firma DIAMANTE, mientras el plano se funde a negro hacia Historia
  */
-// El video tiene un cambio de plano a los 6.9 s (de 10 s): con 0.95 cae
-// justo cuando el plano se oscurece para la firma, y queda disimulado.
-const FRAMES_END = 0.95;
+const FRAMES_END = 1;
+/** Acercamiento de la imagen a lo largo del Hero (1 = sin acercar). */
+const PUSH_IN = 1.12;
 const CHAPTER_1: [number, number] = [0.14, 0.26];
 const CHAPTER_2 = [0.32, 0.4, 0.54, 0.62];
 const CHAPTER_3_START = 0.68;
@@ -126,8 +124,15 @@ export default function Hero() {
     false
   );
 
-  // El plano final se oscurece un poco para que la firma se lea sobre el corte.
-  const shade = useTransform(scrollYProgress, [CHAPTER_3_START - 0.04, CHAPTER_3_START + 0.1], [0, 0.55]);
+  // El plano final se oscurece para que la firma se lea sobre el corte y,
+  // al soltarse el Hero, termina casi en negro: así entra Historia sin corte.
+  const shade = useTransform(
+    scrollYProgress,
+    [CHAPTER_3_START - 0.04, CHAPTER_3_START + 0.1, 0.9, 1],
+    [0, 0.55, 0.55, 0.9]
+  );
+  const pushIn = useTransform(scrollYProgress, [0, 1], [1, PUSH_IN]);
+  const pushInTransform = useMotionTemplate`scale(${pushIn})`;
   const logoDraw = useTransform(scrollYProgress, [CHAPTER_3_START, CHAPTER_3_START + 0.14], [0, 1]);
   const hint = useTransform(scrollYProgress, [0, 0.04], [1, 0]);
   const railScale = useMotionTemplate`scaleY(${scrollYProgress})`;
@@ -141,24 +146,26 @@ export default function Hero() {
       <div className="sticky top-0 h-svh overflow-hidden">
         {/* Fotograma inicial en HTML: se ve de inmediato (es el LCP) mientras
             el canvas descarga el resto de la secuencia. */}
-        <picture>
-          <source media="(max-width: 768px)" srcSet={frameSrc('mobile', 0)} />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={frameSrc('desktop', 0)}
-            alt="Dos cortes Diamante sobre la parrilla, entre llamas y humo"
-            className="absolute inset-0 h-full w-full object-cover"
-            fetchPriority="high"
-            decoding="async"
-          />
-        </picture>
-        {scrub ? (
-          <canvas
-            ref={canvasRef}
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full opacity-0 transition-opacity duration-300 ease-out data-[ready=true]:opacity-100"
-          />
-        ) : null}
+        <m.div className="absolute inset-0" style={scrub ? { transform: pushInTransform } : undefined}>
+          <picture>
+            <source media="(max-width: 768px)" srcSet={frameSrc('mobile', 0)} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={frameSrc('desktop', 0)}
+              alt="Cortes Diamante sobre la parrilla, entre llamas y humo"
+              className="absolute inset-0 h-full w-full object-cover"
+              fetchPriority="high"
+              decoding="async"
+            />
+          </picture>
+          {scrub ? (
+            <canvas
+              ref={canvasRef}
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full opacity-0 transition-opacity duration-300 ease-out data-[ready=true]:opacity-100"
+            />
+          ) : null}
+        </m.div>
 
         {/* Viñeta y degradado inferior: dan contraste al texto sin apagar el fuego */}
         <div
@@ -225,9 +232,7 @@ export default function Hero() {
               Selección curada de cortes premium para quienes reconocen la diferencia.
             </p>
             <div className="hero-line [animation-delay:520ms]">
-              <GoldButton href={whatsappLink()} external icon={<WhatsAppIcon className="h-4 w-4" />}>
-                Comprar por WhatsApp
-              </GoldButton>
+              <GoldButton href="#pedido">Hacer mi pedido</GoldButton>
             </div>
           </div>
         </m.div>

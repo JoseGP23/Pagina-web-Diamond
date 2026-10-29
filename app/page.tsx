@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import Hero from '@/components/scenes/Hero';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import OrderProvider from '@/components/order/OrderProvider';
 
 const sceneLoading = <div className="h-screen w-full bg-charcoal" />;
 
@@ -22,22 +23,28 @@ const ChefScene = dynamic(() => import('@/components/scenes/ChefScene'), {
 const BlackReserveScene = dynamic(() => import('@/components/scenes/BlackReserveScene'), {
   loading: () => sceneLoading,
 });
+const CatalogScene = dynamic(() => import('@/components/scenes/CatalogScene'), {
+  loading: () => sceneLoading,
+});
 const Footer = dynamic(() => import('@/components/scenes/Footer'), {
   loading: () => <div className="h-96 w-full bg-charcoal-light" />,
 });
 
 export default function Home() {
   return (
-    <main>
-      <Hero />
-      <HistoriaScene />
-      <FireSelectionScene />
-      <DailyScene />
-      <SmokeScene />
-      <ChefScene />
-      <BlackReserveScene />
-      <Footer />
-      <WhatsAppButton />
-    </main>
+    <OrderProvider>
+      <main>
+        <Hero />
+        <HistoriaScene />
+        <FireSelectionScene />
+        <DailyScene />
+        <SmokeScene />
+        <ChefScene />
+        <BlackReserveScene />
+        <CatalogScene />
+        <Footer />
+        <WhatsAppButton />
+      </main>
+    </OrderProvider>
   );
 }

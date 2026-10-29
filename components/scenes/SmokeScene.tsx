@@ -11,22 +11,21 @@ import {
   staggerContainer,
 } from "@/lib/motion";
 import { usePrefersReducedMotion, useIsMobile } from "@/lib/useMediaQuery";
-import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
+import { SMOKE_CUSTOM_MESSAGE, whatsappLink } from '@/lib/whatsapp';
+import { productsByLine } from '@/lib/catalog';
+import { useOrderActions } from '@/components/order/OrderProvider';
+import GoldButton from '@/components/GoldButton';
+import { WhatsAppIcon } from '@/components/Icons';
 import SmokeParticles from "@/components/SmokeParticles";
 
-const PRODUCTS = [
-  "Smoked Short Rib",
-  "Hawaiian Style",
-  "Brisket",
-  "Beef Pastrami",
-  "Smoke Selection",
-];
+const PRODUCTS = productsByLine("smoke");
 
 export default function SmokeScene() {
   const sectionRef = useRef<HTMLElement>(null);
   const reducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
   const inView = useInView(sectionRef, { amount: 0.2 });
+  const { openProduct } = useOrderActions();
 
   // Los productos se "condensan" desde el humo: desenfoque fuerte a nítido.
   // En celular sin desenfoque (es lo más caro de pintar): solo sube y aparece.
@@ -115,20 +114,18 @@ export default function SmokeScene() {
         {/* Cada producto abre el pedido por WhatsApp con su nombre ya escrito */}
         <ul className="mt-12 flex flex-col items-center gap-x-10 gap-y-1 sm:flex-row sm:flex-wrap sm:justify-center">
           {PRODUCTS.map((product) => (
-            <m.li key={product} variants={productVariants}>
-              <a
-                href={whatsappLink(orderCutMessage(product))}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Pedir ${product} por WhatsApp`}
-                className="group relative inline-flex min-h-[48px] items-center font-serif text-[clamp(1.75rem,3vw,2.5rem)] italic leading-tight text-gold transition-colors duration-200 ease-out hover:text-bone"
+            <m.li key={product.id} variants={productVariants}>
+              <button
+                type="button"
+                onClick={() => openProduct(product.id)}
+                className="group relative inline-flex min-h-[48px] items-center font-serif text-[clamp(1.6rem,2.6vw,2.25rem)] italic leading-tight text-gold transition-colors duration-200 ease-out hover:text-bone"
               >
-                {product}
+                {product.name}
                 <span
                   aria-hidden="true"
                   className="absolute bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-bone/70 transition-transform duration-300 ease-out group-hover:scale-x-100"
                 />
-              </a>
+              </button>
             </m.li>
           ))}
         </ul>
@@ -136,8 +133,13 @@ export default function SmokeScene() {
           className="mt-4 font-condensed text-[12px] tracking-[0.3em] text-bone/70"
           variants={revealVariants(reducedMotion)}
         >
-          TOCA UN PRODUCTO PARA PEDIRLO POR WHATSAPP
+          TOCA UN PRODUCTO PARA AGREGARLO A TU PEDIDO
         </m.p>
+        <m.div className="mt-8" variants={revealVariants(reducedMotion)}>
+          <GoldButton href={whatsappLink(SMOKE_CUSTOM_MESSAGE)} external icon={<WhatsAppIcon className="h-4 w-4" />}>
+            Personaliza tu corte
+          </GoldButton>
+        </m.div>
 
         <m.p
           className="mt-10 font-condensed text-[12px] tracking-[0.35em] text-bone/60"

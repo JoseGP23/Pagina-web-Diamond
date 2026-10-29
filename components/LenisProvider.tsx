@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
+import { registerLenis } from '@/lib/scroll';
 
 /**
  * Smooth scroll global. lerp conservador (0.1) para que se sienta
@@ -21,6 +22,7 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
       wheelMultiplier: 1,
       touchMultiplier: 1.2,
     });
+    registerLenis(lenis);
 
     let rafId: number;
     function raf(time: number) {
@@ -31,6 +33,7 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
 
     return () => {
       cancelAnimationFrame(rafId);
+      registerLenis(null);
       lenis.destroy();
     };
   }, [reducedMotion]);

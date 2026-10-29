@@ -7,6 +7,8 @@ import { VIEWPORT_ONCE, CINEMATIC_EASE, revealVariants, staggerContainer } from 
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon, CutIcon, SmokeIcon, HandshakeIcon, ShieldCheckIcon } from '@/components/Icons';
 import IconFeatureRow from '@/components/IconFeatureRow';
+import GoldButton from '@/components/GoldButton';
+import { useOrderActions } from '@/components/order/OrderProvider';
 
 const FEATURES = [
   { icon: <DiamondIcon />, label: 'SELECCIÓN PREMIUM' },
@@ -18,6 +20,7 @@ const FEATURES = [
 
 export default function ChefScene() {
   const reducedMotion = usePrefersReducedMotion();
+  const { browseLine } = useOrderActions();
 
   return (
     <section
@@ -101,12 +104,10 @@ export default function ChefScene() {
 
         <IconFeatureRow items={FEATURES} columns={2} />
 
-        <m.p
-          className="font-serif text-2xl italic text-gold"
-          variants={revealVariants(reducedMotion)}
-        >
-          Tu visión, nuestra carne.
-        </m.p>
+        <m.div className="flex flex-col items-start gap-6" variants={revealVariants(reducedMotion)}>
+          <p className="font-serif text-2xl italic text-gold">Tu visión, nuestra carne.</p>
+          <GoldButton onClick={() => browseLine('chef')}>Escribe tu pedido</GoldButton>
+        </m.div>
       </m.div>
     </section>
   );

@@ -101,7 +101,8 @@ lib/
   motion.ts               Curvas y variantes de animación compartidas
   useMediaQuery.ts        Hooks de responsive / prefers-reduced-motion
 media/
-  hero.mp4               Video original del Hero (fuente de los fotogramas, no se publica)
+  hero-16x9.mp4          Video del Hero para escritorio (fuente de los fotogramas, no se publica)
+  hero-9x16.mp4          Video del Hero para celular (fuente de los fotogramas, no se publica)
 public/
   hero-frames/           Fotogramas del Hero: desktop/ (horizontal) y mobile/ (vertical)
   images/                Fotografías reales de Diamante
@@ -132,14 +133,14 @@ El número y los mensajes están en [`lib/whatsapp.ts`](lib/whatsapp.ts): cambia
 Todo el contenido visual se controla desde estos archivos, no hace falta tocar los componentes:
 
 - **Imágenes generales:** agrega el archivo a `public/images/` y actualiza su `url` en [`lib/images.ts`](lib/images.ts) (ej. `url: '/images/mi-foto.jpg'`).
-- **Video del Hero:** reemplaza `media/hero.mp4` (1920×1080) y regenera los fotogramas con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto (borra antes el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile`):
+- **Video del Hero:** reemplaza `media/hero-16x9.mp4` (1920×1080) y `media/hero-9x16.mp4` (1080×1920) y regenera los fotogramas con [ffmpeg](https://ffmpeg.org) desde la carpeta del proyecto (borra antes el contenido de `public/hero-frames/desktop` y `public/hero-frames/mobile`):
 
   ```bash
-  ffmpeg -i media/hero.mp4 -vf "fps=8,scale=1600:-2:flags=lanczos" -c:v libwebp -quality 58 -compression_level 6 -preset photo public/hero-frames/desktop/%03d.webp
-  ffmpeg -i media/hero.mp4 -vf "fps=8,crop=608:1080:656:0" -c:v libwebp -quality 55 -compression_level 6 -preset photo public/hero-frames/mobile/%03d.webp
+  ffmpeg -i media/hero-16x9.mp4 -vf "fps=10,scale=1600:-2:flags=lanczos" -c:v libwebp -quality 54 -compression_level 6 -preset photo public/hero-frames/desktop/%03d.webp
+  ffmpeg -i media/hero-9x16.mp4 -vf "fps=10,scale=640:-2:flags=lanczos" -c:v libwebp -quality 52 -compression_level 6 -preset photo public/hero-frames/mobile/%03d.webp
   ```
 
-  La versión de celular toma la franja central vertical del video, sin ampliarla. Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts). Si el video nuevo tiene un cambio de plano, ajusta `FRAMES_END` en el Hero para que caiga en la transición a la firma.
+  Si cambia la cantidad de fotogramas, actualiza `FRAME_COUNT` en [`lib/heroFrames.ts`](lib/heroFrames.ts). Si el video nuevo tiene un cambio de plano, ajusta `FRAMES_END` en el Hero para que caiga en la transición a la firma.
 - **Cortes del carrusel "Fire Selection"** (nombre, descripción, foto y video opcional de cada corte): edita [`lib/cuts.ts`](lib/cuts.ts).
 
 Recomendaciones para videos de fondo: formato `.mp4` (H.264), sin audio o silenciado, idealmente menor a 8-10 MB para que cargue rápido.

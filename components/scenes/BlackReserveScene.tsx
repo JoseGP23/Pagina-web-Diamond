@@ -6,12 +6,14 @@ import { images } from '@/lib/images';
 import { VIEWPORT_ONCE, VIEWPORT_REPEAT, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion } from '@/lib/useMediaQuery';
 import { DiamondIcon } from '@/components/Icons';
-import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
 
 // Black Reserve va más lento y suave que el resto: es la escena de mayor exclusividad.
 const SLOW_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/** Cortes madurados en seco: disponibilidad limitada, se piden por WhatsApp. */
+/**
+ * Cortes madurados en seco. BLACK es vitrina de marca: según el guion del
+ * cliente no se presenta en el asistente de ventas, así que no tiene botón de pedido.
+ */
 const RESERVE_CUTS = ['Ribeye Dry Aged', 'New York Dry Aged', 'Tomahawk Dry Aged'];
 
 export default function BlackReserveScene() {
@@ -105,19 +107,8 @@ export default function BlackReserveScene() {
           variants={slowReveal}
         >
           {RESERVE_CUTS.map((cut) => (
-            <li key={cut} className="w-full sm:w-auto">
-              <a
-                href={whatsappLink(orderCutMessage(cut))}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Pedir ${cut} por WhatsApp`}
-                className="group flex min-h-[64px] flex-col items-center justify-center px-8 py-4"
-              >
-                <span className="font-serif text-2xl italic text-bone transition-colors duration-200 ease-out group-hover:text-gold">
-                  {cut}
-                </span>
-                <span className="mt-1 font-condensed text-[12px] tracking-[0.3em] text-gold/90">PEDIR</span>
-              </a>
+            <li key={cut} className="flex min-h-[64px] w-full items-center justify-center px-8 py-4 sm:w-auto">
+              <span className="font-serif text-2xl italic text-bone">{cut}</span>
             </li>
           ))}
         </m.ul>

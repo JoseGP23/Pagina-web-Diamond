@@ -7,16 +7,17 @@ import { images } from '@/lib/images';
 import { VIEWPORT_ONCE, CINEMATIC_EASE, staggerContainer } from '@/lib/motion';
 import { usePrefersReducedMotion, useIsMobile } from '@/lib/useMediaQuery';
 import GoldButton from '@/components/GoldButton';
-import { WhatsAppIcon } from '@/components/Icons';
-import { orderCutMessage, whatsappLink } from '@/lib/whatsapp';
+import { productsByLine } from '@/lib/catalog';
+import { useOrderActions } from '@/components/order/OrderProvider';
 
-/** Cortes de la línea Daily: cada uno abre su pedido por WhatsApp. */
-const DAILY_CUTS = ['Chatas', 'Solomito', 'Muchacho', 'Sobrebarriga', 'Molida Premium'];
+/** Productos de la línea Daily: cada uno abre su ficha para agregarlo al pedido. */
+const DAILY_PRODUCTS = productsByLine('daily');
 
 export default function DailyScene() {
   const ref = useRef<HTMLElement>(null);
   const reducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
+  const { openProduct, browseLine } = useOrderActions();
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   // Rangos fijos (useTransform se queda con los del primer render).
@@ -89,28 +90,20 @@ export default function DailyScene() {
           viewport={VIEWPORT_ONCE}
         >
           <ul className="flex flex-wrap justify-end gap-x-8 gap-y-1 border-t border-bone/15 pt-5">
-            {DAILY_CUTS.map((cut) => (
-              <m.li key={cut} variants={slideIn}>
-                <a
-                  href={whatsappLink(orderCutMessage(cut))}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Pedir ${cut} por WhatsApp`}
+            {DAILY_PRODUCTS.map((product) => (
+              <m.li key={product.id} variants={slideIn}>
+                <button
+                  type="button"
+                  onClick={() => openProduct(product.id)}
                   className="inline-flex min-h-[44px] items-center font-serif text-2xl italic text-bone transition-colors duration-200 ease-out hover:text-gold sm:text-3xl"
                 >
-                  {cut}
-                </a>
+                  {product.sub === 'Res' || product.sub === 'Cerdo' ? product.sub : product.name}
+                </button>
               </m.li>
             ))}
           </ul>
           <m.div variants={slideIn}>
-            <GoldButton
-              href={whatsappLink('Hola Diamante, quiero hacer un pedido de la línea Daily Selection.')}
-              external
-              icon={<WhatsAppIcon className="h-4 w-4" />}
-            >
-              Pedir Daily Selection
-            </GoldButton>
+            <GoldButton onClick={() => browseLine('daily')}>Ver la línea Daily</GoldButton>
           </m.div>
         </m.div>
       </div>

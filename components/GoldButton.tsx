@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 
 type GoldButtonProps = {
-  href: string;
+  /** Con `href` es un enlace; sin él, un botón que llama a `onClick`. */
+  href?: string;
+  onClick?: () => void;
   children: ReactNode;
   className?: string;
   /** Abre en otra pestaña/app (enlaces de WhatsApp). */
@@ -18,11 +20,12 @@ const CLIP = `polygon(${NOTCH}px 0, 100% 0, 100% calc(100% - ${NOTCH}px), calc(1
  * botón se hunde levemente (scale 0.97) para confirmar el clic. Todo es CSS
  * (transform + color), sin JS.
  */
-export default function GoldButton({ href, children, className = '', external = false, icon }: GoldButtonProps) {
+export default function GoldButton({ href, onClick, children, className = '', external = false, icon }: GoldButtonProps) {
+  const Tag = href ? 'a' : 'button';
   return (
-    <a
-      href={href}
-      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    <Tag
+      {...(href ? { href } : { type: 'button' as const, onClick })}
+      {...(href && external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       className={`group relative inline-flex min-h-[48px] items-center overflow-hidden px-7 font-condensed text-[13px] font-medium uppercase tracking-[0.2em] text-gold transition-transform duration-150 ease-out active:scale-[0.97] ${className}`}
       style={{ clipPath: CLIP }}
     >
@@ -37,6 +40,6 @@ export default function GoldButton({ href, children, className = '', external = 
         {icon}
         {children}
       </span>
-    </a>
+    </Tag>
   );
 }

@@ -3,18 +3,12 @@
 import { m } from 'framer-motion';
 import { VIEWPORT_ONCE, CINEMATIC_EASE } from '@/lib/motion';
 import Logo from '@/components/Logo';
-import { WHATSAPP_DISPLAY, whatsappLink } from '@/lib/whatsapp';
-
-const CONTACT_LINKS = [
-  { label: 'WhatsApp', value: WHATSAPP_DISPLAY, href: whatsappLink() },
-  { label: 'Instagram', value: '@diamante.meats', href: 'https://instagram.com/diamante.meats' },
-];
 
 export default function Footer() {
   return (
-    <footer id="contacto" className="relative w-full border-t border-bone/10 bg-charcoal-light px-6 pb-10 pt-20 sm:px-10 lg:px-16">
+    <footer className="relative w-full border-t border-bone/10 bg-charcoal-light px-6 pb-10 pt-20 sm:px-10 lg:px-16">
       <m.div
-        className="mx-auto grid w-full max-w-6xl gap-14 lg:grid-cols-[1.4fr_1fr] lg:items-end"
+        className="mx-auto w-full max-w-6xl"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={VIEWPORT_ONCE}
@@ -30,36 +24,19 @@ export default function Footer() {
           </p>
           <p className="mt-3 font-condensed text-[12px] tracking-[0.4em] text-bone/65">SELECTED MEATS</p>
         </div>
-
-        <div className="flex lg:justify-end">
-          <ul className="flex flex-col gap-4">
-            {CONTACT_LINKS.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col gap-1"
-                >
-                  <span className="font-condensed text-[12px] tracking-[0.3em] text-bone/65">{link.label.toUpperCase()}</span>
-                  <span className="font-serif text-2xl text-bone transition-colors duration-200 ease-out group-hover:text-gold">
-                    {link.value}
-                  </span>
-                </a>
-              </li>
-            ))}
-            <li className="flex flex-col gap-1">
-              <span className="font-condensed text-[12px] tracking-[0.3em] text-bone/65">UBICACIÓN</span>
-              <span className="font-serif text-2xl text-bone">Colombia</span>
-            </li>
-          </ul>
-
-        </div>
       </m.div>
 
-      <p className="mx-auto mt-16 w-full max-w-6xl border-t border-bone/10 pt-6 font-condensed text-[12px] tracking-[0.3em] text-bone/60">
-        © {new Date().getFullYear()} DIAMANTE SELECTED MEATS
-      </p>
+      <div className="mx-auto mt-16 flex w-full max-w-6xl flex-col gap-3 border-t border-bone/10 pt-6 font-condensed text-[12px] tracking-[0.3em] text-bone/60 sm:flex-row sm:items-center sm:justify-between">
+        <p>© {new Date().getFullYear()} DIAMANTE SELECTED MEATS</p>
+        <nav aria-label="Legal" className="flex flex-wrap gap-x-6">
+          <a href="/terminos" className="inline-flex min-h-[44px] items-center transition-colors duration-200 ease-out hover:text-bone">
+            TÉRMINOS Y CONDICIONES
+          </a>
+          <a href="/terminos#datos" className="inline-flex min-h-[44px] items-center transition-colors duration-200 ease-out hover:text-bone">
+            DATOS PERSONALES
+          </a>
+        </nav>
+      </div>
     </footer>
   );
 }

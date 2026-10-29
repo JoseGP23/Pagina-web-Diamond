@@ -14,6 +14,9 @@ export const EASE_IN_OUT: Bezier = [0.77, 0, 0.175, 1];
  * Si se repitieran en cada pasada, al volver hacia arriba el contenido
  * desaparecería y habría que esperar a que se anime de nuevo.
  */
+/** Curva tipo iOS para paneles que entran desde un borde (bottom sheet, cajón lateral). */
+export const EASE_DRAWER: [number, number, number, number] = [0.32, 0.72, 0, 1];
+
 export const VIEWPORT_ONCE = { once: true, amount: 0.3 } as const;
 
 /**

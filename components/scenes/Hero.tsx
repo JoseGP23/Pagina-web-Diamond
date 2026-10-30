@@ -146,14 +146,14 @@ export default function Hero() {
       <div className="sticky top-0 h-svh overflow-hidden">
         {/* Fotograma inicial en HTML: se ve de inmediato (es el LCP) mientras
             el canvas descarga el resto de la secuencia. */}
-        <m.div className="absolute inset-0" style={scrub ? { transform: pushInTransform } : undefined}>
+        <m.div className="group absolute inset-0" style={scrub ? { transform: pushInTransform } : undefined}>
           <picture>
             <source media="(max-width: 768px)" srcSet={frameSrc('mobile', 0)} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={frameSrc('desktop', 0)}
               alt="Cortes Diamante sobre la parrilla, entre llamas y humo"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover group-data-[ready=true]:invisible"
               fetchPriority="high"
               decoding="async"
             />
@@ -192,11 +192,12 @@ export default function Hero() {
             </span>
           </a>
           <ul className="flex items-center gap-4 sm:gap-8">
+            {/* En celular solo cabe el acceso al pedido junto al logo. */}
             {NAV_LINKS.map((link, i) => (
-              <li key={link.href} className={i === 0 || i === 2 ? 'hidden md:block' : undefined}>
+              <li key={link.href} className={i < NAV_LINKS.length - 1 ? 'hidden md:block' : undefined}>
                 <a
                   href={link.href}
-                  className="group/nav relative inline-flex min-h-[44px] items-center font-condensed text-[12px] tracking-[0.18em] text-bone/75 transition-colors duration-200 ease-out hover:text-bone"
+                  className="group/nav relative inline-flex min-h-[44px] items-center whitespace-nowrap font-condensed text-[12px] tracking-[0.18em] text-bone/75 transition-colors duration-200 ease-out hover:text-bone"
                 >
                   {link.label.toUpperCase()}
                   <span

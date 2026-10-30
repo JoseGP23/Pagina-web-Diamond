@@ -35,11 +35,6 @@ export const images: Record<string, SceneImage> = {
     alt: 'Corte Diamante directo en la parrilla, listo para servir',
     blurDataURL: GENERIC_BLUR,
   },
-  smokeSeries: {
-    url: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1600&q=80',
-    alt: 'Costillas ahumadas lentamente, textura oscura y humo',
-    blurDataURL: GENERIC_BLUR,
-  },
   chefProgram: {
     url: '/images/chef-cortando-carne.jpg',
     alt: 'Chef profesional cortando un corte Diamante en cocina',

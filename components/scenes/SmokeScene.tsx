@@ -1,9 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { m, useInView } from "framer-motion";
-import { images } from "@/lib/images";
 import {
   VIEWPORT_ONCE,
   CINEMATIC_EASE,
@@ -27,42 +25,25 @@ export default function SmokeScene() {
   const inView = useInView(sectionRef, { amount: 0.2 });
   const { openProduct } = useOrderActions();
 
-  // Los productos se "condensan" desde el humo: desenfoque fuerte a nítido.
-  // En celular sin desenfoque (es lo más caro de pintar): solo sube y aparece.
-  const productVariants = reducedMotion
-    ? revealVariants(true)
-    : isMobile
-      ? revealVariants(false)
-      : {
-          hidden: {
-            opacity: 0,
-            transform: "translateY(18px)",
-            filter: "blur(6px)",
-          },
-          visible: {
-            opacity: 1,
-            transform: "translateY(0px)",
-            filter: "blur(0px)",
-            transition: { duration: 1, ease: CINEMATIC_EASE },
-          },
-        };
-
   return (
     <section
       ref={sectionRef}
       className="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-charcoal py-24"
     >
+      {/* Fondo local (vertical en celular): carga rápido y no depende de un
+          servidor externo, que en datos móviles dejaba la foto borrosa. */}
       <div className="absolute inset-0">
-        <Image
-          src={images.smokeSeries.url}
-          alt={images.smokeSeries.alt}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          placeholder="blur"
-          blurDataURL={images.smokeSeries.blurDataURL}
-          loading="lazy"
-        />
+        <picture>
+          <source media="(max-width: 768px)" srcSet="/images/smoke-9x16.webp" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/smoke-16x9.webp"
+            alt="Brisket ahumado sobre papel de carnicero, con humo"
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
         <div className="absolute inset-0 bg-charcoal/70" />
       </div>
 
@@ -112,9 +93,13 @@ export default function SmokeScene() {
         </m.p>
 
         {/* Cada producto abre el pedido por WhatsApp con su nombre ya escrito */}
+        {/* Los productos entran igual que el resto del texto. Antes llevaban un
+            desenfoque solo en escritorio, pero si la página cambiaba de ancho
+            (girar el celular, achicar la ventana) la lista se volvía a crear
+            después de animarse y quedaba invisible aunque se podía tocar. */}
         <ul className="mt-12 flex flex-col items-center gap-x-10 gap-y-1 sm:flex-row sm:flex-wrap sm:justify-center">
           {PRODUCTS.map((product) => (
-            <m.li key={product.id} variants={productVariants}>
+            <m.li key={product.id} variants={revealVariants(reducedMotion)}>
               <button
                 type="button"
                 onClick={() => openProduct(product.id)}

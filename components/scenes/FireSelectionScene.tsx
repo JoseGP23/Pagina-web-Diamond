@@ -55,9 +55,9 @@ export default function FireSelectionScene() {
   // Cuando la persona cambia el corte (flechas, puntos, teclado, arrastre)
   // la transición es corta para que responda enseguida; el avance
   // automático puede ser más lento y cinematográfico.
-  const mediaDuration = auto ? 0.9 : 0.5;
-  const textDuration = auto ? 0.7 : 0.35;
-  const textDelay = auto ? 0.12 : 0;
+  const mediaDuration = auto ? 0.6 : 0.3;
+  const textDuration = auto ? 0.45 : 0.25;
+  const textDelay = auto ? 0.08 : 0;
 
   function handleDragEnd(_e: unknown, info: PanInfo) {
     // Un gesto rápido basta aunque sea corto: se mira distancia o velocidad.
@@ -181,25 +181,48 @@ export default function FireSelectionScene() {
                   transition: { duration: mediaDuration, ease: CINEMATIC_EASE },
                 }}
                 // La salida es más rápida que la entrada: el corte nuevo toma el protagonismo enseguida.
-                exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_OUT } }}
+                exit={{ opacity: 0, transition: { duration: auto ? 0.35 : 0.2, ease: EASE_OUT } }}
               >
                 {/* El corte es el protagonista: ocupa casi todo el panel (en
                     escritorio, el 68% derecho; en celular, la parte de arriba).
-                    Las fotos vienen sobre negro y el panel también lo es, así que
-                    `object-cover` solo recorta fondo negro y agranda el corte. */}
-                <div className="absolute inset-x-0 top-0 h-[72%] md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[68%]">
+                    Las fotos vienen sobre negro y el panel también lo es. En
+                    escritorio `object-cover` solo recorta fondo negro; en celular
+                    el área es casi cuadrada y recortaba los lados del corte, así
+                    que ahí se muestra la foto completa (`object-contain`). */}
+                <div className="absolute inset-x-0 top-0 flex h-[72%] items-center justify-center md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[68%]">
+                  {/* Sin `fill`: en celular la imagen mide lo que mide la foto, así el
+                      desvanecido de arriba y abajo cae sobre sus bordes reales. */}
                   <Image
                     src={cut.image}
                     alt={`Corte ${cut.name} Diamante`}
-                    fill
+                    width={1600}
+                    height={1600}
                     sizes="(max-width: 768px) 100vw, 800px"
-                    className="scale-[1.08] object-cover object-center"
+                    quality={70}
+                    className="h-auto max-h-full w-full object-contain [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)] md:absolute md:inset-0 md:h-full md:max-h-none md:scale-[1.08] md:object-cover md:[mask-image:none]"
                     draggable={false}
                   />
                 </div>
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent md:bg-gradient-to-r md:from-black md:via-black/40 md:via-35% md:to-transparent md:to-55%" />
               </m.div>
             </AnimatePresence>
+
+            {/* Precarga del corte anterior y el siguiente (mismo tamaño que el
+                visible): al cambiar, la foto ya está en caché y aparece al instante. */}
+            {sectionInView
+              ? [index + 1, index - 1].map((i) => {
+                  const neighbor = CUTS[(i + CUTS.length) % CUTS.length];
+                  return (
+                    <div
+                      key={`preload-${neighbor.id}`}
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 top-0 h-[72%] opacity-0 md:inset-y-0 md:left-auto md:right-0 md:h-full md:w-[68%]"
+                    >
+                      <Image src={neighbor.image} alt="" fill sizes="(max-width: 768px) 100vw, 800px" quality={70} loading="eager" />
+                    </div>
+                  );
+                })
+              : null}
 
             <SmokeParticles variant="spark" intensity={isMobile ? 'low' : 'high'} active={sectionInView && !reducedMotion} />
 

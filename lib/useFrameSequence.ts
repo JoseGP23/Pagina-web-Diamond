@@ -5,6 +5,12 @@ import type { MotionValue } from 'framer-motion';
 import { FRAME_COUNT, frameSrc, type FrameSet } from '@/lib/heroFrames';
 
 const CONCURRENT_LOADS = 4;
+/**
+ * Resolución máxima del canvas. Los fotogramas no tienen más detalle que
+ * ~1,4 px por punto de pantalla, así que pintar a 2x o 3x solo cuesta
+ * rendimiento (sobre todo en celular) sin verse más nítido.
+ */
+const MAX_DPR = 1.5;
 
 /**
  * Orden de carga "de grueso a fino": primero el primer y el último
@@ -33,8 +39,10 @@ function coarseToFineOrder(count: number): number[] {
  * - Nada de estado de React: el progreso se lee de un MotionValue y el
  *   dibujo ocurre como mucho una vez por frame (rAF). React no se vuelve a
  *   renderizar al hacer scroll.
- * - Entre dos fotogramas se mezclan ambos según la fracción de progreso, así
- *   61 fotogramas se sienten tan fluidos como un video completo.
+ * - En escritorio, entre dos fotogramas se mezclan ambos según la fracción
+ *   de progreso para que se sienta como video. En celular se dibuja uno
+ *   solo por frame: la mezcla duplica el trabajo y en pantalla pequeña no
+ *   se nota.
  * - Si un fotograma todavía no llegó, se usa el más cercano ya cargado.
  */
 export function useFrameSequence(
@@ -54,6 +62,7 @@ export function useFrameSequence(
     // (girar una tablet, redimensionar), se cambia de secuencia.
     const mobileQuery = window.matchMedia('(max-width: 768px)');
     let set: FrameSet = mobileQuery.matches ? 'mobile' : 'desktop';
+    const container = canvas.parentElement;
     let frames: (HTMLImageElement | null)[] = new Array(FRAME_COUNT).fill(null);
     let generation = 0;
     let cancelled = false;
@@ -83,7 +92,8 @@ export function useFrameSequence(
       rafId = 0;
       if (!width || !height) return;
       const position = Math.min(Math.max(progress.get(), 0), 1) * (FRAME_COUNT - 1);
-      const key = Math.round(position * 100);
+      // En celular solo cambia el dibujo al pasar de fotograma (no hay mezcla).
+      const key = set === 'mobile' ? Math.floor(position) : Math.round(position * 100);
       if (key === lastDrawn) return;
 
       const index = Math.floor(position);
@@ -94,13 +104,18 @@ export function useFrameSequence(
       drawCover(base);
       const next = frames[index + 1];
       const fraction = position - index;
-      if (base === frames[index] && next && fraction > 0.02) {
+      if (set === 'desktop' && base === frames[index] && next && fraction > 0.02) {
         ctx!.globalAlpha = fraction;
         drawCover(next);
         ctx!.globalAlpha = 1;
       }
       lastDrawn = key;
-      if (canvas!.dataset.ready !== 'true') canvas!.dataset.ready = 'true';
+      if (canvas!.dataset.ready !== 'true') {
+        canvas!.dataset.ready = 'true';
+        // El contenedor también lo sabe: el póster de abajo se oculta y el
+        // navegador deja de componer una capa que ya no se ve.
+        if (container) container.dataset.ready = 'true';
+      }
     }
 
     function requestDraw(force = false) {
@@ -109,7 +124,7 @@ export function useFrameSequence(
     }
 
     const resizeObserver = new ResizeObserver(([entry]) => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
       width = Math.round(entry.contentRect.width * dpr);
       height = Math.round(entry.contentRect.height * dpr);
       canvas.width = width;
